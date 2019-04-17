@@ -7,6 +7,7 @@ from inputargs import Parser
 current_user = getuser()
 parser = Parser()
 args = parser.argparser.parse_args()
+print(args)
 
 class API():
     #ef __init__(self):
