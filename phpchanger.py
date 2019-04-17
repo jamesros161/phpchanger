@@ -35,11 +35,11 @@ def main():
     # args.func()
 
 def run_cmd(api,cmd,args):
-    if api == 'whmapi' and current_user != 'root'
+    if api == 'whmapi' and current_user != 'root':
         sys.exit('WHMAPI commands must be run as root.')
-    if api == 'whmapi' and current_user == 'root'
+    if api == 'whmapi' and current_user == 'root':
         popenargs = [api, cmd, '--output=json'] + args
-    if api == 'uapi' and current_user == 'root'
+    if api == 'uapi' and current_user == 'root':
         popenargs = [api, cmd, '--user=' + root, '--output=json'] + args
     else:
         sys.exit('invalid api type')
