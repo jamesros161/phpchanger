@@ -60,7 +60,7 @@ def determine_uapi_access():
             stderr=PIPE,
             ).communicate()
         print(reqOutput.splitlines())
-        data = json.loads(reqOutput)
+        data = json.loads(reqOutput.splitlines())
         error = json.loads(reqError)
         if args.verbose:
             print('UAPI Access Test STDOUT:\n')
