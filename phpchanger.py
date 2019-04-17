@@ -41,7 +41,7 @@ def run_cmd(api,cmd,args):
         popenargs = [api, cmd, '--output=json'] + args
     if api == 'uapi' and current_user == 'root':
         popenargs = [api, cmd, '--user=' + root, '--output=json'] + args
-    else:
+    if api != 'uapi' or != 'whmapi':
         sys.exit('invalid api type')
         
     data, error = Popen(popenargs, stdout=PIPE,stderr=PIPE).communicate()
