@@ -30,7 +30,7 @@ def main():
 
     determine_uapi_access()
     #print(run_cmd('whmapi1','listaccts', []))
-    print(run_cmd('uapi','domains_data',[],module='DomainInfo']
+    print(run_cmd('uapi','domains_data',[],module='DomainInfo')
     # start the selected module code
     # args.func()
 
