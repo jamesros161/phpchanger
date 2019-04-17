@@ -23,9 +23,10 @@ args = parser.argparser.parse_args()
 
 
 def main():
-    determine_uapi_access()
-
+    
     print(args)
+
+    determine_uapi_access()
 
     # start the selected module code
     # args.func()
