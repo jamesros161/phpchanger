@@ -6,6 +6,7 @@ import warnings
 from getpass import getuser
 from subprocess import Popen, PIPE, call
 from inputargs import Parser
+from api import API
 import tempfile
 import urllib
 import json
@@ -19,6 +20,8 @@ except ImportError:
         from HTMLParser import HTMLParser  # python 2.x
     unescape = HTMLParser().unescape
 
+api = API()
+
 parser = Parser()
 args = parser.argparser.parse_args()
 current_user = getuser()
@@ -30,33 +33,10 @@ def main():
 
     determine_uapi_access()
     #print(run_cmd('whmapi1','listaccts', []))
-    print(run_cmd('uapi','domains_data',[],module='DomainInfo'))
+    print(api.call('uapi','domains_data',[],module='DomainInfo'))
     # start the selected module code
     # args.func()
 
-def run_cmd(api,cmd,params,module=None):
-    if api == 'whmapi1' and current_user != 'root':
-        sys.exit('WHMAPI1 commands must be run as root.')
-    if api == 'whmapi1' and current_user == 'root':
-        popenargs = [api, cmd, '--output=json'] + params
-    if api == 'uapi' and current_user == 'root':
-        popenargs = [api, '--user=root', module, cmd, '--output=json'] + params
-    if api == 'uapi' and current_user !='root':
-        popenargs = [api, module, cmd, '--output=json'] + params
-    if api != 'uapi' and api != 'whmapi1':
-        sys.exit('invalid api type')
-        
-    print(popenargs)
-    data, error = Popen(popenargs, stdout=PIPE,stderr=PIPE).communicate()
-    if error == '':
-        data = json.loads(data)
-        if args.verbose:
-            print('Command Return Data:\n')
-            print(data)
-        return(data)
-    else:
-        print('Command Failed to Run')
-        sys.exit(error)
 
 def determine_uapi_access():
     '''this program needs to run uapi commands differently if ran as user, or as root, and needs to exit if ran as anything else (like a non-cPanel linux user)'''
