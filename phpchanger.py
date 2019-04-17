@@ -62,7 +62,7 @@ def determine_uapi_access():
         data = reqOutput.splitlines()
         error = reqError.splitlines()
         print(type(data[0]))
-        #data = json.loads(data)
+        data = json.loads(data[0])
         #error = json.loads(error[0])
         if args.verbose:
             print('UAPI Access Test STDOUT:\n')
