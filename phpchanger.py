@@ -45,15 +45,15 @@ def run_cmd(api,cmd,args):
         sys.exit('invalid api type')
         
     data, error = Popen(popenargs, stdout=PIPE,stderr=PIPE).communicate()
-        if error == '':
-            data = json.loads(data)
-            if args.verbose:
-                print('Command Return Data:\n')
-                print(data)
-            return(data)
-        else:
-            print('Command Failed to Run')
-            sys.exit(error)
+    if error == '':
+        data = json.loads(data)
+        if args.verbose:
+            print('Command Return Data:\n')
+            print(data)
+        return(data)
+    else:
+        print('Command Failed to Run')
+        sys.exit(error)
 """    
 def determine_uapi_access():
     '''this program needs to run uapi commands differently if ran as user, or as root, and needs to exit if ran as anything else (like a non-cPanel linux user)'''
