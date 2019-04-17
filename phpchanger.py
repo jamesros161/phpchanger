@@ -36,7 +36,7 @@ def determine_uapi_access():
     '''this program needs to run uapi commands differently if ran as user, or as root, and needs to exit if ran as anything else (like a non-cPanel linux user)'''
     global CURRENT_USER
     CURRENT_USER = getuser()
-
+    print(CURRENT_USER)
     if CURRENT_USER != "root":
         # this testing command is kinda arbitrary, but list_features is a decent one to use since it should work on any real cPanel user
         testing_cmd = ['uapi',  'Features list_features --user=' + CURRENT_USER + '--output=json']
