@@ -40,7 +40,7 @@ def run_cmd(api,cmd,params,module=None):
     if api == 'whmapi1' and current_user == 'root':
         popenargs = [api, cmd, '--output=json'] + params
     if api == 'uapi' and current_user == 'root':
-        popenargs = [api, '--user=' + root, module, cmd, '--output=json'] + args
+        popenargs = [api, '--user=root', module, cmd, '--output=json'] + args
     if api == 'uapi' and current_user !='root':
         popenargs = [api, module, cmd, '--output=json'] + args
     if api != 'uapi' and api != 'whmapi1':
