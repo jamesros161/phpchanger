@@ -21,7 +21,7 @@ except ImportError:
 
 parser = Parser()
 args = parser.argparser.parse_args()
-current_user = get_user()
+current_user = getuser()
 
 
 def main():
