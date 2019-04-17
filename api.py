@@ -2,8 +2,11 @@ from getpass import getuser
 import sys
 from subprocess import Popen, PIPE
 import json
+from inputargs import Parser
 
 current_user = getuser()
+parser = Parser()
+args = parser.argparser.parse_args()
 
 class API():
     #ef __init__(self):
