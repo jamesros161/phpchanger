@@ -51,33 +51,26 @@ def determine_uapi_access():
             if args.verbose:
                 print('UAPI Access Test STDOUT:\n')
                 print(data)
-                print('UAPI Access Test STDERR: ')
-                print(error)
                 
-        #error = json.loads(error)
-        
-            
-        #if "Failed to load cPanel user file for" in testing_stderr:
-        #    sys.exit("This needs to be ran as either root, or as the cPanel user you wish to modify.")
+        if error != '':
+            if "Failed to load cPanel user file for" in error:
+            sys.exit("This needs to be ran as either root, or as the cPanel user you wish to modify.")
     else:
-        testing_cmd = ['uapi', 'Features', 'list_features',  '--user=' + CURRENT_USER ,  '--output=json']
-        reqOutput, reqError = Popen(
+        testing_cmd = ['uapi', 'Features', 'list_features', '--user=root', '--output=json']
+        data, error = Popen(
             testing_cmd, 
             stdout=PIPE, 
             stderr=PIPE,
             ).communicate()
-        data = reqOutput
-        error = reqError
-        data = json.loads(data)
-        error = json.loads(error)
-        if args.verbose:
-            print('UAPI Access Test STDOUT:\n')
-            print(data)
-            print('UAPI Access Test STDERR: ')
+        if error == '':
+            data = json.loads(data)
+            if args.verbose:
+                print('UAPI Access Test STDOUT:\n')
+                print(data)
+        if error != '':
             print(error)
+            sys.exit(error)
             
-        
-
 """
 def check_api_return_for_issues(api_return, cmd_type):
     '''This checks the return values of uapi to exit or warn the user if uapi is telling us something has gone wrong'''
