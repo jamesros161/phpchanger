@@ -29,7 +29,7 @@ def main():
     print(args)
 
     determine_uapi_access()
-    run_cmd('whmapi','listaccts', '')
+    print(run_cmd('whmapi','listaccts', ''))
 
     # start the selected module code
     # args.func()
