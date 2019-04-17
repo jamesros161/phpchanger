@@ -47,7 +47,7 @@ def determine_uapi_access():
             stderr=PIPE,
             )
         data, error = request.communicate()
-        returncode = request.returncode()
+        returncode = request.returncode
         print(data)
         print(error)
         print(returncode)
