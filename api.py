@@ -7,7 +7,6 @@ from inputargs import Parser
 current_user = getuser()
 parser = Parser()
 args = parser.argparser.parse_args()
-print(args)
 
 class API():
     #ef __init__(self):
@@ -28,7 +27,7 @@ class API():
         data, error = Popen(popenargs, stdout=PIPE,stderr=PIPE).communicate()
         if error == '':
             data = json.loads(data)
-            if params.verbose:
+            if args.verbose:
                 print('Command Return Data:\n')
                 print(data)
             return(data)
