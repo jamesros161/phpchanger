@@ -50,6 +50,7 @@ def run_cmd(api,cmd,args):
     if api != 'uapi' and api != 'whmapi':
         sys.exit('invalid api type')
         
+    print(popenargs)
     data, error = Popen(popenargs, stdout=PIPE,stderr=PIPE).communicate()
     if error == '':
         data = json.loads(data)
