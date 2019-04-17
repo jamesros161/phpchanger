@@ -8,6 +8,7 @@ from subprocess import Popen, PIPE, call
 from inputargs import Parser
 import tempfile
 import urllib
+import json
 
 try:
     from html import unescape  # python 3.4+
@@ -58,10 +59,13 @@ def determine_uapi_access():
             stdout=PIPE, 
             stderr=PIPE,
             ).communicate()
+        data = json.loads(testing_cmd[0])
+        error = json.loads(testing_cmd[1])
         if args.verbose:
             print('UAPI Access Test STDOUT:\n')
-            print(testing_cmd[0])
-            print('UAPI Access Test STDERR: ' + str(testing_cmd[1]))
+            print(data)
+            print('UAPI Access Test STDERR: ')
+            print(error)
             
         
 
