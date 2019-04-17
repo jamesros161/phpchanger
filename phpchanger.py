@@ -41,15 +41,16 @@ def determine_uapi_access():
     if CURRENT_USER != "root":
         # this testing command is kinda arbitrary, but list_features is a decent one to use since it should work on any real cPanel user
         testing_cmd = ['uapi', 'Features', 'list_features', '--output=json']
-        reqOutput, reqError = Popen(
+        request = Popen(
             testing_cmd, 
             stdout=PIPE, 
             stderr=PIPE,
-            ).communicate()
-        data = reqOutput
+            )
+        data, error = request.communicate()
+        returncode = request.returncode()
         print(data)
-        error = reqError
         print(error)
+        print(returncode)
         data = json.loads(data)
         #error = json.loads(error)
         if args.verbose:
