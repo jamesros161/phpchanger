@@ -29,15 +29,15 @@ def main():
     print(args)
 
     determine_uapi_access()
-    print(run_cmd('whmapi','listaccts', None))
+    print(run_cmd('whmapi1','listaccts', None))
 
     # start the selected module code
     # args.func()
 
 def run_cmd(api,cmd,args):
-    if api == 'whmapi' and current_user != 'root':
-        sys.exit('WHMAPI commands must be run as root.')
-    if api == 'whmapi' and current_user == 'root':
+    if api == 'whmapi1' and current_user != 'root':
+        sys.exit('WHMAPI1 commands must be run as root.')
+    if api == 'whmapi1' and current_user == 'root':
         if args != None:
             popenargs = [api, cmd, '--output=json'] + args
         else:
@@ -47,7 +47,7 @@ def run_cmd(api,cmd,args):
             popenargs = [api, cmd, '--user=' + root, '--output=json'] + args
         else:
             popenargs = [api, cmd, '--user=' + root, '--output=json']
-    if api != 'uapi' and api != 'whmapi':
+    if api != 'uapi' and api != 'whmapi1':
         sys.exit('invalid api type')
         
     print(popenargs)
