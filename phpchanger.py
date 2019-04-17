@@ -54,7 +54,7 @@ def run_cmd(api,cmd,args):
     else:
         print('Command Failed to Run')
         sys.exit(error)
-"""    
+
 def determine_uapi_access():
     '''this program needs to run uapi commands differently if ran as user, or as root, and needs to exit if ran as anything else (like a non-cPanel linux user)'''
     global CURRENT_USER
@@ -93,7 +93,7 @@ def determine_uapi_access():
             print(error)
             sys.exit(error)
 
-            
+"""            
 def check_api_return_for_issues(api_return, cmd_type):
     '''This checks the return values of uapi to exit or warn the user if uapi is telling us something has gone wrong'''
 
