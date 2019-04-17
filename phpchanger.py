@@ -23,8 +23,8 @@ args = parser.argparser.parse_args()
 
 
 def main():
-    
-    print(args)
+
+    print(args.verbose)
 
     determine_uapi_access()
 
