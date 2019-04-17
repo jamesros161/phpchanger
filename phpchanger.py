@@ -21,6 +21,7 @@ except ImportError:
 
 parser = Parser()
 args = parser.argparser.parse_args()
+current_user = get_user()
 
 
 def main():
@@ -28,11 +29,32 @@ def main():
     print(args)
 
     determine_uapi_access()
+    run_cmd('whmapi','listaccts', '')
 
     # start the selected module code
     # args.func()
 
-
+def run_cmd(api,cmd,args):
+    if api == 'whmapi' and current_user != 'root'
+        sys.exit('WHMAPI commands must be run as root.')
+    if api == 'whmapi' and current_user == 'root'
+        popenargs = [api, cmd, '--output=json'] + args
+    if api == 'uapi' and current_user == 'root'
+        popenargs = [api, cmd, '--user=' + root, '--output=json'] + args
+    else:
+        sys.exit('invalid api type')
+        
+    data, error = Popen(popenargs, stdout=PIPE,stderr=PIPE).communicate()
+        if error == '':
+            data = json.loads(data)
+            if args.verbose:
+                print('Command Return Data:\n')
+                print(data)
+            return(data)
+        else:
+            print('Command Failed to Run')
+            sys.exit(error)
+"""    
 def determine_uapi_access():
     '''this program needs to run uapi commands differently if ran as user, or as root, and needs to exit if ran as anything else (like a non-cPanel linux user)'''
     global CURRENT_USER
@@ -44,7 +66,7 @@ def determine_uapi_access():
         data, error = Popen(
             testing_cmd, 
             stdout=PIPE, 
-            stderr=PIPE,
+            stderr=PIPE
             ).communicate()
         if error == '':
             data = json.loads(data)
@@ -70,8 +92,8 @@ def determine_uapi_access():
         if error != '':
             print(error)
             sys.exit(error)
+
             
-"""
 def check_api_return_for_issues(api_return, cmd_type):
     '''This checks the return values of uapi to exit or warn the user if uapi is telling us something has gone wrong'''
 
@@ -96,6 +118,7 @@ def check_api_return_for_issues(api_return, cmd_type):
     else:
         print("Unrecognized cmd_type, can't check.")
 
+        
 def run_cmd_and_parse_its_yaml_return(cmd):
     if args.verbose:
         print "+ " + cmd
