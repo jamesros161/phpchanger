@@ -54,7 +54,7 @@ def determine_uapi_access():
                 
         if error != '':
             if "Failed to load cPanel user file for" in error:
-            sys.exit("This needs to be ran as either root, or as the cPanel user you wish to modify.")
+                sys.exit("This needs to be ran as either root, or as the cPanel user you wish to modify.")
     else:
         testing_cmd = ['uapi', 'Features', 'list_features', '--user=root', '--output=json']
         data, error = Popen(
