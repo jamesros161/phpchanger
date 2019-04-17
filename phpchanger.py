@@ -54,13 +54,13 @@ def determine_uapi_access():
             sys.exit("This needs to be ran as either root, or as the cPanel user you wish to modify.")
     else:
         testing_cmd = ['uapi', 'Features list_features --user=' + CURRENT_USER + '--output=json']
-        testing_stderr = Popen(
+        reqOutput, reqError = Popen(
             testing_cmd, 
             stdout=PIPE, 
             stderr=PIPE,
             ).communicate()
-        data = json.loads(testing_cmd[0])
-        error = json.loads(testing_cmd[1])
+        data = json.loads(reqOutput)
+        error = json.loads(reqError)
         if args.verbose:
             print('UAPI Access Test STDOUT:\n')
             print(data)
