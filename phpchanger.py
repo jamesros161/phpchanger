@@ -40,18 +40,24 @@ def determine_uapi_access():
     print(CURRENT_USER)
     if CURRENT_USER != "root":
         # this testing command is kinda arbitrary, but list_features is a decent one to use since it should work on any real cPanel user
-        testing_cmd = ['uapi',  'Features list_features --user=' + CURRENT_USER + '--output=json']
-        testing_stderr = Popen(
+        testing_cmd = ['uapi', 'Features', 'list_features', '--output=json']
+        reqOutput, reqError = Popen(
             testing_cmd, 
             stdout=PIPE, 
             stderr=PIPE,
             ).communicate()
+        data = reqOutput
+        error = reqError
+        data = json.loads(data)
+        error = json.loads(error)
         if args.verbose:
-            print('UAPI Access Test STDOUT: ' + str(testing_cmd[0]))
-            print('UAPI Access Test STDERR: ' + str(testing_cmd[1]))
+            print('UAPI Access Test STDOUT:\n')
+            print(data)
+            print('UAPI Access Test STDERR: ')
+            print(error)
             
-        if "Failed to load cPanel user file for" in testing_stderr:
-            sys.exit("This needs to be ran as either root, or as the cPanel user you wish to modify.")
+        #if "Failed to load cPanel user file for" in testing_stderr:
+        #    sys.exit("This needs to be ran as either root, or as the cPanel user you wish to modify.")
     else:
         testing_cmd = ['uapi', 'Features', 'list_features',  '--user=' + CURRENT_USER ,  '--output=json']
         reqOutput, reqError = Popen(
