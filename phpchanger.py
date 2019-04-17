@@ -59,7 +59,8 @@ def determine_uapi_access():
             stderr=PIPE,
             ).communicate()
         if args.verbose:
-            print('UAPI Access Test STDOUT: ' + str(testing_cmd[0]))
+            print('UAPI Access Test STDOUT:\n')
+            print(testing_cmd[0])
             print('UAPI Access Test STDERR: ' + str(testing_cmd[1]))
             
         
