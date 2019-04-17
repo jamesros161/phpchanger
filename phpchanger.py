@@ -54,10 +54,10 @@ def determine_uapi_access():
         data = json.loads(data)
         #error = json.loads(error)
         if args.verbose:
-            print('UAPI Access Test STDOUT:\n')
-            print(data)
-            print('UAPI Access Test STDERR: ')
-            print(error)
+            #print('UAPI Access Test STDOUT:\n')
+            #print(data)
+            #print('UAPI Access Test STDERR: ')
+            #print(error)
             
         #if "Failed to load cPanel user file for" in testing_stderr:
         #    sys.exit("This needs to be ran as either root, or as the cPanel user you wish to modify.")
