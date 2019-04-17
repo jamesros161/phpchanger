@@ -53,7 +53,7 @@ def determine_uapi_access():
         print(returncode)
         data = json.loads(data)
         #error = json.loads(error)
-        if args.verbose:
+        #if args.verbose:
             #print('UAPI Access Test STDOUT:\n')
             #print(data)
             #print('UAPI Access Test STDERR: ')
