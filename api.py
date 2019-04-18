@@ -230,14 +230,8 @@ class API():
 
     def ini_edit(self):
         user_domains = self.breakup_domains_by_users()
-        for key, value in user_domains.iteritems():
-            if self.current_user == 'root':
-                self.ini_editor(value, key)
-            else:
-                x = 0
-                while x < len(key):
-                    if self.current_user_owns_this_domain(key[x]):
-                        self.ini_editor(self.current_user, value[x])
+        for domain, user in user_domains.iteritems():
+            self.ini_editor(user, domain)
 
     def ini_editor(self, user, domain):
         params = ['type=vhost', 'vhost=' + domain]
