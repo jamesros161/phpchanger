@@ -116,8 +116,9 @@ class API():
         x = 0
         while x < len(self.args.domains):
             print(self.args.domains[x])
+            print(self.call('whmapi1', cmd='getdomainowner'))
             x += 1
-            
+
         user = self.call('whmapi1', cmd='getdomainowner')
         vhost_php_versions = self.call(api, cmd, module=module)
         list_of_vhosts = []
