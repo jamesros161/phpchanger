@@ -29,11 +29,11 @@ class API():
         elif cmd_type == "uapi":
             print(cmd_type)
             # kill the script if these
+            print(api_return['apiversion'])
             if api_return['apiversion'] != 3:
-                print(api_return['apiversion'])
                 sys.exit("This script not tested with uapi version " + api_return['apiversion'] + "expected 3 instead, exiting.")
-            if api_return['result']['errors'] is not None:
-                print(api_return['result']['errors'])
+            print(api_return['result']['errors'])
+            if api_return['result']['errors'] is not None:    
                 sys.exit("uapi returned this error, exiting:\n" + '\n'.join(error for error in api_return['result']['errors']))
 
             # warn the user if these
@@ -59,6 +59,7 @@ class API():
             sys.exit('invalid api type')
             
         data, error = Popen(popenargs, stdout=PIPE,stderr=PIPE).communicate()
+
         if error == '':
             data = json.loads(data)
             if self.args.verbose:
