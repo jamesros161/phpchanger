@@ -46,6 +46,31 @@ class API():
 
         return uapi_installed_php_versions['result']['data']['versions']
 
+    def breakup_domains_by_users(self):
+        domains_to_check = self.args.domains
+        '''build list from domains into list of matching users, and their matching domains'''
+        if self.current_user == "root":
+            whmapi_domain_info = self.call("whmapi1", cmd="get_domain_info")
+            matching_domain_info = [domain_info for domain_info in whmapi_domain_info['data']['domains'] if domain_info['domain'] in domains_to_check]
+            matching_users = {domain_info["user"] for domain_info in matching_domain_info}
+        # transform list of matching domain info into dict of matching users and their own matching domains
+            return [
+                {
+                    "user": this_user,
+                    "domains": [domain_info["domain"] for domain_info in matching_domain_info if domain_info["user"] == this_user]
+                } for this_user in matching_users
+            ]
+
+        else:
+            return [
+                {
+                    "user": self.current_user,
+                    "domains": domains_to_check
+                }
+            ]
+    
+
+
     def manager_get(self):
         api = "uapi"
         module = "LangPHP"
@@ -124,12 +149,10 @@ class API():
         api = "uapi"
         module = "LangPHP"
         cmd = "php_ini_get_user_content"
-        params =['type=vhost', 'vhost=' + self.args.domain]
-
-        php_ini_settings = self.call(api, module=module, cmd=cmd, params=params)
-        #check_api_return_for_issues(php_ini_settings, cmd_type)
-
-        metadata = php_ini_settings['result']['metadata']['LangPHP']
-
-        print(metadata['vhost'] + " (" + metadata['path'] + "):")
-        print(unescape(php_ini_settings['result']['data']['content']))
+        domains = self.breakup_domains_by_users()
+        for domain in domains['domains']:        
+            params =['type=vhost', 'vhost=' + domain]
+            php_ini_settings = self.call(api, module=module, cmd=cmd, params=params)
+            metadata = php_ini_settings['result']['metadata']['LangPHP']
+            print(metadata['vhost'] + " (" + metadata['path'] + "):")
+            print(unescape(php_ini_settings['result']['data']['content']))
