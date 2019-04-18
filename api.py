@@ -72,6 +72,8 @@ class API():
                 ]
             elif self.args.fpm is False:
                 params ="php_fpm=0"
+            for domain in self.args.domains:
+                params.append("vhost=" + domain)
             print(self.call(api, cmd, params))
         """
         else:
