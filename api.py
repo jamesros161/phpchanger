@@ -166,7 +166,10 @@ class API():
         if self.current_user == "root":    
             if isinstance(self.args.fpm, (list,)):
                 if self.args.version is None:
-                    warnings.warn('Keep in mind that PHP-FPM will fail to enable if the PHP version is set to "inherit". This script doesnt check for that, hopefully you did.')
+                    warnings.warn("Keep in mind that PHP-FPM will fail "
+                        "to enable if the PHP version is set to \"inherit\""
+                        ". \nThis script doesnt check for that, hopefully you did."
+                        )
                 elif self.args.version == "inherit" :
                     sys.exit('PHP-FPM cannot be enabled while also setting PHP version to "inherit", exiting.')
                 params=[
