@@ -113,7 +113,7 @@ class API():
         cmd = "php_get_vhost_versions"
 
         users_domains = self.breakup_domains_by_users()
-        for domain in users_domains.iteritems():
+        for domain , user in users_domains.iteritems():
             print(domain)
             print(users_domains[domain])
             if users_domains[domain] is not None:
