@@ -221,7 +221,7 @@ class API():
             user=user, module='LangPHP', 
             cmd='php_ini_get_user_content', params=params)
         metadata = php_ini_settings['result']['metadata']['LangPHP']
-        title = metadata['vhost'] + " (" + metadata['path'] + "):\n"
+        title = metadata['vhost'] + " (" + metadata['path'] + "):"
         h_border = '{s:{c}^{n}}'.format(s='#', n=len(title), c='#')
         print("\n" + h_border + "\n")
         print(title)
