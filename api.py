@@ -7,7 +7,7 @@ class API():
         self.current_user = getuser()
         self.args = parser_args
 
-    def call(self, api,cmd,params='',module=None):
+    def call(self, api,cmd,params=[],module=None):
         if api == 'whmapi1' and self.current_user != 'root':
             sys.exit('WHMAPI1 commands must be run as root.')
         if api == 'whmapi1' and self.current_user == 'root':
