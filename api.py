@@ -138,7 +138,7 @@ class API():
             api = "whmapi1"
             cmd = "php_set_vhost_versions"
             params = []
-
+            self.breakup_domains_by_users()
             if isinstance(self.args.fpm, (list,)):
                 if self.args.version is None:
                     warnings.warn('Keep in mind that PHP-FPM will fail to enable if the PHP version is set to "inherit". This script doesnt check for that, hopefully you did.')
