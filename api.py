@@ -173,6 +173,7 @@ class API():
                     if self.current_user_owns_this_domain(value[x]):
                         params = ['type=vhost', 'vhost=' + value[x]]
                         php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
+                        metadata = php_ini_settings['result']['metadata']['LangPHP']
                         print(metadata['vhost'] + " (" + metadata['path'] + "):")
                         print(unescape(php_ini_settings['result']['data']['content']))
                     x += 1
