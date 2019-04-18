@@ -166,7 +166,7 @@ class API():
             self.call('whmapi1', cmd=cmd, params=params)
         else:
             self.call('uapi', cmd=cmd, module='LangPHP', params=params)
-        print('The PHP version for the selected domains has been set to ' + php_id)
+        print('The PHP version for the selected domains has been set to ' + self.php_id)
    
     def get_php_id(self):
         if self.args.version:
