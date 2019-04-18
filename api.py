@@ -55,7 +55,7 @@ class API():
 
     def manager_set(self):
         if self.current_user == "root":
-            api = "whmapi"
+            api = "whmapi1"
             cmd = "php_set_vhost_versions"
 
             if isinstance(self.args.fpm, (list,)):
