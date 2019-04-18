@@ -74,6 +74,7 @@ class API():
                 params ="php_fpm=0"
             print(api + ' ' + cmd)
             print(params)
+            self.call(api, cmd, params)
         """
         else:
             cmd_type = "uapi"
