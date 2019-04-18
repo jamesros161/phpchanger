@@ -37,9 +37,11 @@ class API():
                 sys.exit("uapi returned this error, exiting:\n" + '\n'.join(error for error in api_return['result']['errors']))
 
             # warn the user if these
+            print(api_return['result']['messages'])
             if api_return['result']['messages'] is not None:
                 print(api_return['result']['messages'])
                 warnings.warn("uapi returned this message:\n" + '\n'.join(message for message in api_return['result']['messages']))
+            print(api_return['result']['warnings'])
             if api_return['result']['warnings'] is not None:
                 print(api_return['result']['warnings'])
                 warnings.warn("uapi returned this warning:\n" + '\n'.join(warning for warning in api_return['result']['warnings']))
