@@ -186,9 +186,9 @@ class API():
             self.call('whmapi1', cmd=cmd, params=params)
         else:
             self.call('uapi', cmd=cmd, module='LangPHP', params=params)
-
-        if (self.args.fpm) or (isinstance(self.args.fpm, (list,))):
-            print('The PHP-FPM Configuration has been updated')
+        if self.current_user == "root":
+            if (self.args.fpm) or (isinstance(self.args.fpm, (list,))):
+                print('The PHP-FPM Configuration has been updated')
         if self.args.version is not None:
             print('The PHP version for the selected domains has been set to ' + self.php_id)
 
@@ -196,17 +196,18 @@ class API():
 
     def ini_get(self):
         user_domains = self.breakup_domains_by_users()
-        for key, value in user_domains.iteritems():
-            if self.current_user == 'root':
-                self.ini_getter(value, key)
-            else:
-                x = 0
-                while x < len(key):
-                    if self.current_user_owns_this_domain(key[x]):
-                        self.ini_getter(self.current_user, key[x])
-                    else:
-                        print('\nDomain ' + value[x] + ' is not owned by this user --skipping...\n')
-                    x += 1
+        for domain, user in user_domains.iteritems():
+            self.ini_getter(user, domain)
+            #if self.current_user == 'root':
+            #    self.ini_getter(user, domain)
+            #else:
+            #    x = 0
+            #    while x < len(user_domains[domain]):
+            #        if self.current_user_owns_this_domain(user):
+            #            self.ini_getter(self.current_user, user)
+            #        else:
+            #            print('\nDomain ' + domain[x] + ' is not owned by this user --skipping...\n')
+            #        x += 1
 
     def ini_getter(self,user,domain):
         params = ['type=vhost', 'vhost=' + domain]
