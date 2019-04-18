@@ -192,7 +192,7 @@ class API():
             self.call('whmapi1', cmd=cmd, params=params)
         else:
             self.call('uapi', cmd=cmd, module='LangPHP', params=params)
-        if self.args.fpm is True:
+        if self.args.fpm or isinstance(self.args.fpm, (list,)):
             print('The PHP-FPM Configuration has been updated')
         if self.args.version is not None:
             print('The PHP version for the selected domains has been set to ' + self.php_id)
