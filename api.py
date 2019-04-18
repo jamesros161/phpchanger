@@ -18,34 +18,28 @@ class API():
 
     ### GENERAL API METHODS ####
 
+    def format_title(self, title):
+        title = '#   ' + title + '   #'
+        h_border = '{s:{c}^{n}}'.format(s='#', n=len(title), c='#')
+        print("\n" + h_border + "")
+        print(title)
+        print("" + h_border + "\n")
+
     def check_api_return_for_issues(self, api_return, cmd_type):
         if cmd_type == "whmapi1":
-            #print(cmd_type)
-            # kill the script if these
-            #print(api_return['metadata']['reason'])
             if api_return['metadata']['version'] != 1:
                 sys.exit("This script not tested with whmapi version " +  api_return['metadata']['version'] + "expected 1 instead, exiting.")
-            #print(api_return['metadata']['result'])
             if api_return['metadata']['result'] != 1:
                 sys.exit("whmapi1 returned error flag with this reason, exiting:\n" + api_return['metadata']['reason'])
         elif cmd_type == "uapi":
-            #print(cmd_type)
-            # kill the script if these
-            #print(api_return['apiversion'])
             if api_return['apiversion'] != 3:
                 sys.exit("This script not tested with uapi version " + api_return['apiversion'] + "expected 3 instead, exiting.")
-            #print(api_return['result']['errors'])
             if api_return['result']['errors'] is not None:    
                 sys.exit("uapi returned this error, exiting:\n" + '\n'.join(error for error in api_return['result']['errors']))
 
-            # warn the user if these
-            #print(api_return['result']['messages'])
             if api_return['result']['messages'] is not None:
-                print(api_return['result']['messages'])
                 warnings.warn("uapi returned this message:\n" + '\n'.join(message for message in api_return['result']['messages']))
-            #print(api_return['result']['warnings'])
             if api_return['result']['warnings'] is not None:
-                print(api_return['result']['warnings'])
                 warnings.warn("uapi returned this warning:\n" + '\n'.join(warning for warning in api_return['result']['warnings']))
         else:
             print("Unrecognized cmd_type, can't check.")
@@ -72,7 +66,6 @@ class API():
             self.check_api_return_for_issues(data, api)
             return(data)
         else:
-            print(error)
             sys.exit(api + ' Command Failed to Run')
 
     def get_php_id(self):
@@ -147,7 +140,7 @@ class API():
             vhost_php_versions = self.call(api, user=user, cmd=cmd, module=module)
             for vhost in vhost_php_versions['result']['data']:
                 if vhost['vhost'] == domain:          
-                    print '\nVHOST: ' + vhost['vhost'] + ":"
+                    self.format_title('VHOST: ' + vhost['vhost'])
                     if "system_default" in vhost['phpversion_source']:
                         print "PHP Version: inherit (" + vhost['version'] + ")"
                     else:
@@ -221,11 +214,7 @@ class API():
             user=user, module='LangPHP', 
             cmd='php_ini_get_user_content', params=params)
         metadata = php_ini_settings['result']['metadata']['LangPHP']
-        title = "#   " + metadata['vhost'] + " (" + metadata['path'] + ")   #"
-        h_border = '{s:{c}^{n}}'.format(s='#', n=len(title), c='#')
-        print("\n" + h_border + "")
-        print(title)
-        print("" + h_border + "\n")
+        self.format_title(metadata['vhost'] + " (" + metadata['path'] + ")")
         print(unescape(php_ini_settings['result']['data']['content']))
 
     def ini_set(self):
@@ -271,7 +260,7 @@ class API():
     def ini_editor(self, user, domain):
         params = ['type=vhost', 'vhost=' + domain]
         php_ini_settings = self.call('uapi', user=user, module='LangPHP', cmd='php_ini_get_user_content', params=params)
-        contents_to_edit = tempfile.NamedTemporaryFile(prefix=domain, suffix=".tmp")
+        contents_to_edit = tempfile.NamedTemporaryFile(prefix=domain + '-', suffix=".tmp",)
         contents_to_edit.write(unescape(php_ini_settings['result']['data']['content']))
         contents_to_edit.flush()
         call(['nano' , contents_to_edit.name])
@@ -283,6 +272,5 @@ class API():
         self.call('uapi', user=user, module='LangPHP', cmd='php_ini_set_user_content', params=setparams)
         print('PHP.INI saved for doamin :: ' + domain)
         self.ini_getter(user, domain)
-        #print(new_php_ini_settings)
 
     
