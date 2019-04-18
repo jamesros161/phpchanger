@@ -146,7 +146,7 @@ class API():
         print(user_domains)
         for key, value in user_domains.iteritems():  
             user = key     
-            params =['type=vhost', 'vhost=' + value]
+            params = ['type=vhost', 'vhost=' + value]
             php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
             metadata = php_ini_settings['result']['metadata']['LangPHP']
             print(metadata['vhost'] + " (" + metadata['path'] + "):")
@@ -156,13 +156,13 @@ class API():
         api = "uapi"
         module = "LangPHP"
         cmd = "php_ini_set_user_basic_directives"
-        domains = self.breakup_domains_by_users()
-        for domain in domains[0]['domains']:
-            params=['type=vhost', 'vhost=' + domain]
+        user_domains = self.breakup_domains_by_users()
+        for key, value in user_domains.iteritems():
+            user = key     
+            params = ['type=vhost', 'vhost=' + value]
             for index, setting in enumerate(self.args.setting, start=1):
                 params.append("directive-" + str(index) + "=" + setting[0] + "%3A" + setting[1])
-                cmd_return = self.call(api, module=module, cmd=cmd, params=params)
-                print(cmd_return)
+            print (self.call(api, user=user, module=module, cmd=cmd, params=params))
     """
     def ini_edit(self, domain, user_arg):
         api = "uapi"
