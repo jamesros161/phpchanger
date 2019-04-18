@@ -124,7 +124,7 @@ class API():
         api = "uapi"
         module = "LangPHP"
         cmd = "php_ini_get_user_content"
-        params =['type=vhost', 'vhost=' + self.args.domains]
+        params =['type=vhost', 'vhost=' + self.args.domain]
 
         php_ini_settings = self.call(api, module=module, cmd=cmd, params=params)
         #check_api_return_for_issues(php_ini_settings, cmd_type)
