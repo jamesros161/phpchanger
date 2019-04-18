@@ -198,10 +198,10 @@ class API():
         php_ini_settings = self.call('uapi', 
             user=user, module='LangPHP', 
             cmd='php_ini_get_user_content', params=params)
-        print(php_ini_settings)
+        print(php_ini_settings['result']['data']['content'])
         metadata = php_ini_settings['result']['metadata']['LangPHP']
         self.format_title(metadata['vhost'] + " (" + metadata['path'] + ")")
-        print(unescape(php_ini_settings['result']['data']['content']))
+        #print(unescape(php_ini_settings['result']['data']['content']))
 
     def ini_set(self):
         user_domains = self.breakup_domains_by_users()
