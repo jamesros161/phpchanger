@@ -20,11 +20,11 @@ class API():
         if cmd_type == "whmapi1":
             print(cmd_type)
             # kill the script if these
+            print(api_return['metadata']['version'])
             if api_return['metadata']['version'] != 1:
-                print(api_return['metadata']['version'])
                 sys.exit("This script not tested with whmapi version " +  api_return['metadata']['version'] + "expected 1 instead, exiting.")
+            print(api_return['metadata']['result'])
             if api_return['metadata']['result'] != 1:
-                print(api_return['metadata']['version'])
                 sys.exit("whmapi1 returned error flag with this reason, exiting:\n" + api_return['metadata']['reason'])
         elif cmd_type == "uapi":
             print(cmd_type)
