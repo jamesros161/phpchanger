@@ -61,7 +61,7 @@ class API():
             sys.exit('invalid api type')
             
         data, error = Popen(popenargs, stdout=PIPE,stderr=PIPE).communicate()
-        print(error)
+        
         if error == '':
             data = json.loads(data)
             if self.args.verbose:
@@ -187,11 +187,11 @@ class API():
             else:
                 sys.exit("Provided PHP version " + php_id + " is not installed. Currently installed:\n" + '\n'.join(installed_php_versions))
 
-        for domain in self.args.domains:
-            params.append("vhost=" + domain)
-        print(params)
-        cmd_return = self.call(api, module=module, cmd=cmd, params=params)
-        print(cmd_return)
+            for domain in self.args.domains:
+                params.append("vhost=" + domain)
+            #print(params)
+            self.call(api, module=module, cmd=cmd, params=params)
+            print('PHP version for domains '.join(self.args.domains) + ' has been set to ' + self.args.version)
     
     def ini_getter(self,user,domain):
         params = ['type=vhost', 'vhost=' + domain]
