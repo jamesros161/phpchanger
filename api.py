@@ -74,20 +74,22 @@ class API():
 
     def get_installed_php_versions(self):
         uapi_installed_php_versions = self.call("uapi", module="LangPHP", cmd="php_get_installed_versions")
-        #check_api_return_for_issues(uapi_installed_php_versions, "uapi")
 
         return uapi_installed_php_versions['result']['data']['versions']
 
     def breakup_domains_by_users(self):
         
         users_domains = {}
-        print(self.args.domains)
-        print(len(self.args.domains))
         i = 0
         while i < len(self.args.domains):
             domain = self.args.domains[i]
             user = self.call('whmapi1', cmd='getdomainowner',params=['domain=' + domain])['data']['user']
-            users_domains[domain] = user
+            if user is not None:
+                users_domains[domain] = user
+            else:
+                print("\n" + domain + " Either does not exist, " 
+                    "or is not owned by the user calling this function --skipping\n"
+                    )
             i += 1
 
         print(users_domains)
@@ -114,25 +116,20 @@ class API():
 
         users_domains = self.breakup_domains_by_users()
         for domain , user in users_domains.iteritems():
-            if users_domains[domain] is not None:
-                vhost_php_versions = self.call(api, user=user, cmd=cmd, module=module)
-                for vhost in vhost_php_versions['result']['data']:
-                    if vhost['vhost'] == domain:          
-                        print '\nVHOST: ' + vhost['vhost'] + ":"
-                        if "system_default" in vhost['phpversion_source']:
-                            print "PHP Version: inherit (" + vhost['version'] + ")"
-                        else:
-                            print "PHP Version: " + vhost['version']
-                        print "PHP-FPM Status: " + ("Enabled" if vhost['php_fpm'] == 1 else "Disabled")
-                        if vhost['php_fpm'] == 1:
-                            print("PHP-FPM Pool, Max Children: " + str(vhost['php_fpm_pool_parms']['pm_max_children']))
-                            print("PHP-FPM Pool, Process Idle Timeout: " + str(vhost['php_fpm_pool_parms']['pm_process_idle_timeout']))
-                            print("PHP-FPM Pool, Max Requests: " + str(vhost['php_fpm_pool_parms']['pm_max_requests']) + "\n")
-            else:
-                print("\n" + domain + " Either does not exist, " 
-                    "or is not owned by the user calling this function --skipping\n"
-                    )
-    
+            vhost_php_versions = self.call(api, user=user, cmd=cmd, module=module)
+            for vhost in vhost_php_versions['result']['data']:
+                if vhost['vhost'] == domain:          
+                    print '\nVHOST: ' + vhost['vhost'] + ":"
+                    if "system_default" in vhost['phpversion_source']:
+                        print "PHP Version: inherit (" + vhost['version'] + ")"
+                    else:
+                        print "PHP Version: " + vhost['version']
+                    print "PHP-FPM Status: " + ("Enabled" if vhost['php_fpm'] == 1 else "Disabled")
+                    if vhost['php_fpm'] == 1:
+                        print("PHP-FPM Pool, Max Children: " + str(vhost['php_fpm_pool_parms']['pm_max_children']))
+                        print("PHP-FPM Pool, Process Idle Timeout: " + str(vhost['php_fpm_pool_parms']['pm_process_idle_timeout']))
+                        print("PHP-FPM Pool, Max Requests: " + str(vhost['php_fpm_pool_parms']['pm_max_requests']) + "\n")
+                
     def manager_set(self):
         if self.current_user == "root":
             api = "whmapi1"
