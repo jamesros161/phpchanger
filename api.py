@@ -71,7 +71,7 @@ class API():
             return(data)
         else:
             print('Command Failed to Run')
-            sys.exit(error)
+            sys.exit(1)
 
     def get_installed_php_versions(self):
         uapi_installed_php_versions = self.call("uapi", module="LangPHP", cmd="php_get_installed_versions")
