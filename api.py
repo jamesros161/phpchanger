@@ -105,7 +105,7 @@ class API():
 
         for domain in self.args.domains:
             params.append(" vhost=" + domain)
-
+        print(params)
         cmd_return = self.call(api, module=module, cmd=cmd, params=params)
         print(cmd_return)
         #check_api_return_for_issues(cmd_return, cmd_type)
