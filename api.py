@@ -113,9 +113,24 @@ class API():
         cmd = "php_get_vhost_versions"
 
         users_domains = self.breakup_domains_by_users()
-        for domain, user in users_domains.iteritems():
+        for domain in users_domains.iteritems():
             if users_domains[domain] is not None:
-                print(domain + ' :: ' + users_domains[domain])
+                vhost_php_versions = self.call(api, user=users_domains[domain], cmd=cmd, module=module)
+                for vhost in (vhost for vhost in vhost_php_versions['result']['data'] if vhost['vhost'] == users_domains[domain]):          
+                    print vhost['vhost'] + ":"
+                    if "system_default" in vhost['phpversion_source']:
+                        print "PHP Version: inherit (" + vhost['version'] + ")"
+                    else:
+                        print "PHP Version: " + vhost['version']
+                    print "PHP-FPM Status: " + ("Enabled" if vhost['php_fpm'] == 1 else "Disabled")
+                    if vhost['php_fpm'] == 1:
+                        print "PHP-FPM Pool, Max Children: " + str(vhost['php_fpm_pool_parms']['pm_max_children'])
+                        print "PHP-FPM Pool, Process Idle Timeout: " + str(vhost['php_fpm_pool_parms']['pm_process_idle_timeout'])
+                        print "PHP-FPM Pool, Max Requests: " + str(vhost['php_fpm_pool_parms']['pm_max_requests'])
+            else:
+                print(domain + " Either does not exist, " 
+                    "or is not owned by the user calling this function"
+                    )
 
         vhost_php_versions = self.call(api, cmd, module=module)
         list_of_vhosts = []
