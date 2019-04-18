@@ -37,7 +37,7 @@ class API():
         cmd = "php_get_vhost_versions"
 
         vhost_php_versions = self.call(api, cmd, module=module)
-        print vhost_php_versions
+        #print vhost_php_versions
         #check_api_return_for_issues(vhost_php_versions, cmd_type)
 
         for vhost in (vhost for vhost in vhost_php_versions['result']['data'] if vhost['vhost'] in self.args.domains):
