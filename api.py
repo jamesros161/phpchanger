@@ -122,7 +122,10 @@ class API():
         if len(list_of_vhosts) == 0:
             sys.exit('No vhosts found for given user')
         else:
-            print(self.args.domains)
+            list_of_matching_vhosts = []
+            for vhost in (vhost for vhost in vhost_php_versions['result']['data'] if vhost['vhost'] in self.args.domains):
+                list_of_matching_vhosts.append(vhost['vhost'])
+                print(len(list_of_matching_vhosts))
             for vhost in (vhost for vhost in vhost_php_versions['result']['data'] if vhost['vhost'] in self.args.domains):
                 print vhost['vhost'] + ":"
                 if "system_default" in vhost['phpversion_source']:
