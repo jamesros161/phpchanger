@@ -161,7 +161,8 @@ class API():
                 params ="php_fpm=0"
             for domain in self.args.domains:
                 params.append("vhost=" + domain)
-            print(self.call(api, cmd=cmd, params=params))
+            self.call(api, cmd=cmd, params=params)
+            print('PHP version for domains '.join(self.args.domains) + ' has been set to ' + self.args.version)
         else:
             api = "uapi"
             module = "LangPHP"
