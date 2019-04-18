@@ -70,6 +70,7 @@ class API():
             self.check_api_return_for_issues(data, api)
             return(data)
         else:
+            print(error)
             sys.exit(api + ' Command Failed to Run')
 
     def get_installed_php_versions(self):
