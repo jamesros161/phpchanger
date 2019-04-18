@@ -47,16 +47,14 @@ class Parser():
             description="The cPanel MultiPHP Manager, terminal edition.",
             help=self.helpstr.mngr_parser,
             epilog=self.epilogs.mngr_parser,
-            formatter_class=Raw,
-            dest='mngr_parser'
+            formatter_class=Raw
         )
 
         self.ini_parser = self.primary_subparser.add_parser('ini',
             description="The cPanel MultiPHP INI Editor, terminal edition.",
             help=self.helpstr.ini_parser,
             epilog=self.epilogs.ini_parser,
-            formatter_class=Raw,
-            dest='ini_parser'
+            formatter_class=Raw
         )
 
     def create_mngr_subparsers(self):
