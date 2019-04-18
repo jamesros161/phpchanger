@@ -67,7 +67,7 @@ class API():
         response = self.call('uapi', module='DomainInfo', 
             cmd='list_domains', user=self.current_user)
         data = response['result']['data']
-        for key, value in data:
+        for value in data.iteritems:
             print(value)
         #users_domains = users_domains + data['main_domain']
         #print(users_domains)
