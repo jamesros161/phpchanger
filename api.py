@@ -67,7 +67,7 @@ class API():
         response = self.call('uapi', module='DomainInfo', 
             cmd='list_domains', user=self.current_user)
         data = response['result']['data']
-        users_domains + response['main_domain']
+        users_domains = users_domains + data['main_domain']
         print(users_domains)
 
     def manager_get(self):
