@@ -159,7 +159,6 @@ class API():
         module = "LangPHP"
         cmd = "php_ini_get_user_content"
         user_domains = self.breakup_domains_by_users()
-        print(user_domains)
         for key, value in user_domains.iteritems():  
             user = key
             if self.current_user == 'root':
@@ -174,6 +173,8 @@ class API():
                     if self.current_user_owns_this_domain(value[x]):
                         params = ['type=vhost', 'vhost=' + value[x]]
                         php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
+                        print(metadata['vhost'] + " (" + metadata['path'] + "):")
+                        print(unescape(php_ini_settings['result']['data']['content']))
                     x += 1
             
 
