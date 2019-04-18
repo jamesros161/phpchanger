@@ -161,8 +161,21 @@ class API():
                 params ="php_fpm=0"
             for domain in self.args.domains:
                 params.append("vhost=" + domain)
+            if self.args.version:
+                installed_php_versions = self.get_installed_php_versions()
+            # if user gave us digits, prefix ea-php, else we assume the user gave a full php ID.
+            try:
+                php_id = "ea-php" + str(int(self.args.version))
+            except ValueError:
+                php_id = self.args.version
+
+            if php_id in installed_php_versions or php_id == "inherit":
+                params.append("version=" + php_id)
+            else:
+                sys.exit("Provided PHP version " + php_id + " is not installed. Currently installed:\n" + '\n'.join(installed_php_versions))
+
             self.call(api, cmd=cmd, params=params)
-            print('PHP version for domains '.join(self.args.domains) + ' has been set to ' + self.args.version)
+            print('The PHP version for the selected domains has been set to ' + php_id)
 
         else:
             api = "uapi"
@@ -191,7 +204,7 @@ class API():
                 params.append("vhost=" + domain)
             #print(params)
             self.call(api, module=module, cmd=cmd, params=params)
-            print('PHP version for domains '.join(self.args.domains) + ' has been set to ' + self.args.version)
+            print('The PHP version for the selected domains has been set to ' + php_id)
     
     def ini_getter(self,user,domain):
         params = ['type=vhost', 'vhost=' + domain]
