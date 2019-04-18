@@ -85,6 +85,7 @@ class API():
             api = "uapi"
             module = "LangPHP"
             cmd = "php_set_vhost_versions"
+            params = []
 
             # args.fpm ends up true if neither --fpm, --nofpm are given
             if self.args.fpm is not True:
