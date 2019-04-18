@@ -1,15 +1,13 @@
-#!/usr/bin/python2.7
 '''cPanels EasyApache 4 MultiPHP tools, terminal edition.'''
 import sys
 import os
 import warnings
 from getpass import getuser
 from subprocess import Popen, PIPE, call
-from inputargs import Parser
-from api import API
+import argparse
+import yaml
 import tempfile
 import urllib
-import json
 
 try:
     from html import unescape  # python 3.4+
@@ -20,62 +18,158 @@ except ImportError:
         from HTMLParser import HTMLParser  # python 2.x
     unescape = HTMLParser().unescape
 
-parser = Parser()
-args = parser.argparser.parse_args()
-current_user = getuser()
-
 
 def main():
+    determine_uapi_access()
 
+    argparser = argparse.ArgumentParser(
+        description="cPanels EasyApache 4 MultiPHP tools, terminal edition.",
+        prog="multiphp.py",
+        epilog='''usage examples:
+  multiphp.py manager get example.com example2.com
+  multiphp.py ini edit example.com''',
+        formatter_class=argparse.RawTextHelpFormatter)
+
+    # all subparsers are going to want this same one/many domains list, initialized here to be included as parent later
+    domains_parser = argparse.ArgumentParser(add_help=False)
+    domains_parser.add_argument(
+        'domains',
+        type=str.lower,
+        help='one or more domains to check',
+        nargs="+")
+    check_parser = argparse.ArgumentParser(add_help=False)
+    check_parser.add_argument(
+        '-c', '--check',
+        help='''run get after this command makes changes''',
+        action='store_true')
+
+    argparser.add_argument(
+        '--verbose',
+        action='store_true',
+        help='verbose')
+    argsubparsers = argparser.add_subparsers(help='module')
+
+    manager_argparser = argsubparsers.add_parser(
+        'manager',
+        description="The cPanel MultiPHP Manager, terminal edition.",
+        help='mess with them PHP versions',
+        epilog='''usage examples:
+  multiphp.py manager get example.com
+  multiphp.py manager set example.com -v 73''',
+        formatter_class=argparse.RawTextHelpFormatter)
+    manager_argsubparsers = manager_argparser.add_subparsers(
+        help='action',
+        dest='action')
+
+    manager_get_argparser = manager_argsubparsers.add_parser(
+        'get',
+        help='check PHP versions and PHP-FPM settings',
+        parents=[domains_parser],
+        epilog='''usage examples:
+  multiphp.py manager get example.com
+  multiphp.py manager get example.com example2.com example3.com''',
+        formatter_class=argparse.RawTextHelpFormatter)
+    manager_set_argparser = manager_argsubparsers.add_parser(
+        'set',
+        help='make changes to PHP versions and PHP-FPM settings',
+        parents=[domains_parser, check_parser],
+        epilog='''usage examples:
+  multiphp.py manager set example.com -v 73
+  multiphp.py manager set example.com example2.com example3.com -v inherit --nofpm
+  multiphp.py manager set example.com example2.com --fpm 5 10 20
+  multiphp.py manager set example.com -v ea-php72 --fpm 50 25 100''',
+        formatter_class=argparse.RawTextHelpFormatter)
+    manager_set_argparser.add_argument(
+        '-v', '--version',
+        help='''PHP version ID to use, like ea-php## or alt-php##,
+  or just the two ## digits to imply ea-php##, or the "inherit" option''',
+        type=str,
+        metavar="php_version_id")
+
+    manager_set_fpm_group = manager_set_argparser.add_mutually_exclusive_group()
+    manager_set_fpm_group.add_argument(
+        '--nofpm',
+        help='disable PHP-FPM (requires root)',
+        dest='fpm',
+        action='store_false')
+    manager_set_fpm_group.add_argument(
+        '--fpm',
+        help='enable PHP-FPM, with these pool variables (requires root)',
+        default=None,
+        metavar=('max_children', 'process_idle_timeout', 'max_requests'),
+        nargs=3)
+
+    manager_argparser.set_defaults(func=manager)
+
+    ini_argparser = argsubparsers.add_parser(
+        'ini',
+        description="The cPanel MultiPHP INI Editor, terminal edition.",
+        help='mess with them PHP settings',
+        epilog='''usage examples:
+  multiphp.py ini get example.com example2.com
+  multiphp.py ini set example.com -s memory_limit 128M
+  multiphp.py ini edit example.com''',
+        formatter_class=argparse.RawTextHelpFormatter)
+
+
+    ini_argsubparsers = ini_argparser.add_subparsers(
+        help='action',
+        dest='action')
+
+    ini_argsubparsers.add_parser(
+        'get',
+        parents=[domains_parser],
+        help='check PHP settings',
+        epilog='''usage examples:
+  multiphp.py ini get example.com
+  multiphp.py ini get example.com example2.com''',
+        formatter_class=argparse.RawTextHelpFormatter)
+    ini_set_argparser = ini_argsubparsers.add_parser(
+        'set',
+        parents=[domains_parser, check_parser],
+        help='make changes to specified PHP settings',
+        epilog='''usage examples:
+  multiphp.py ini set example.com example2.com -s memory_limit 128M
+  multiphp.py ini set example.com -s post_max_size 256M -s upload_max_filesize 256M''',
+        formatter_class=argparse.RawTextHelpFormatter)
+    ini_set_argparser.add_argument(
+        '-s', '--setting',
+        help='set a php setting to a given value, can be passed multiple times',
+        required=True,
+        metavar=('php_setting', 'value'),
+        nargs=2,
+        action='append')
+    ini_argsubparsers.add_parser(
+        'edit',
+        parents=[domains_parser, check_parser],
+        help='make changes with $EDITOR to current PHP settings config',
+        epilog='''usage examples:
+  multiphp.py ini edit example.com
+  multiphp.py ini edit example.com example2.com''',
+        formatter_class=argparse.RawTextHelpFormatter)
+
+    ini_argparser.set_defaults(func=ini)
+
+    global args
+    args = argparser.parse_args()
     print(args)
 
-    #determine_uapi_access()
-    #print(run_cmd('whmapi1','listaccts', []))
-    #print(api.call('uapi','domains_data',[],module='DomainInfo'))
     # start the selected module code
-    # args.func()
     args.func()
-
 
 def determine_uapi_access():
     '''this program needs to run uapi commands differently if ran as user, or as root, and needs to exit if ran as anything else (like a non-cPanel linux user)'''
     global CURRENT_USER
     CURRENT_USER = getuser()
-    print(CURRENT_USER)
+
     if CURRENT_USER != "root":
         # this testing command is kinda arbitrary, but list_features is a decent one to use since it should work on any real cPanel user
-        testing_cmd = ['uapi', 'Features', 'list_features', '--output=json']
-        data, error = Popen(
-            testing_cmd, 
-            stdout=PIPE, 
-            stderr=PIPE
-            ).communicate()
-        if error == '':
-            data = json.loads(data)
-            if args.verbose:
-                print('UAPI Access Test STDOUT:\n')
-                print(data)
-                
-        if error != '':
-            if "Failed to load cPanel user file for" in error:
-                sys.exit("This needs to be ran as either root, or as the cPanel user you wish to modify.")
-    else:
-        testing_cmd = ['uapi', 'Features', 'list_features', '--user=root', '--output=json']
-        data, error = Popen(
-            testing_cmd, 
-            stdout=PIPE, 
-            stderr=PIPE,
-            ).communicate()
-        if error == '':
-            data = json.loads(data)
-            if args.verbose:
-                print('UAPI Access Test STDOUT:\n')
-                print(data)
-        if error != '':
-            print(error)
-            sys.exit(error)
+        testing_cmd = 'uapi Features list_features > /dev/null'
+        testing_stderr = Popen(testing_cmd, shell=True, stderr=PIPE, close_fds=True).communicate()[1]
 
-"""            
+        if "Failed to load cPanel user file for" in testing_stderr:
+            sys.exit("This needs to be ran as either root, or as the cPanel user you wish to modify.")
+
 def check_api_return_for_issues(api_return, cmd_type):
     '''This checks the return values of uapi to exit or warn the user if uapi is telling us something has gone wrong'''
 
@@ -100,16 +194,11 @@ def check_api_return_for_issues(api_return, cmd_type):
     else:
         print("Unrecognized cmd_type, can't check.")
 
-        
 def run_cmd_and_parse_its_yaml_return(cmd):
     if args.verbose:
         print "+ " + cmd
-    response = []
-    response[0], response[1] = Popen(
-        cmd, stdout=PIPE, 
-        stderr=PIPE
-        ).communicate()
-    return response
+    return yaml.safe_load(Popen(cmd, shell=True,
+                                stdout=PIPE).stdout.read())
 
 def get_user_arg(user):
     if user == getuser():
@@ -290,7 +379,6 @@ def ini():
                     ini_get(domain, uapi_user_arg)
             elif args.action == "edit":
                 ini_edit(domain, uapi_user_arg)
-"""
 
 if __name__ == '__main__':
     main()
