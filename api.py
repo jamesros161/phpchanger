@@ -79,19 +79,6 @@ class API():
         return uapi_installed_php_versions['result']['data']['versions']
 
     def breakup_domains_by_users(self):
-        #domains_to_check = self.args.domains
-        #user_domains = {}
-        #if self.current_user == "root":
-        #    whmapi_domain_info = self.call("whmapi1", cmd="get_domain_info")
-        #    x = 0
-        #    while x < len(whmapi_domain_info['data']['domains']):
-        #        if whmapi_domain_info['data']['domains'][x]['domain'] in domains_to_check:
-        #            user_domains[whmapi_domain_info['data']['domains'][x]['user']] = whmapi_domain_info['data']['domains'][x]['domain']
-        #        x += 1
-        #else:
-        #    user_domains[self.current_user] = domains_to_check
-        #if len(user_domains) == 0:
-        #    sys.exit('There are no domains on the server matching your request')
         
         users_domains = {}
         print(self.args.domains)
@@ -124,7 +111,11 @@ class API():
         api = "uapi"
         module = "LangPHP"
         cmd = "php_get_vhost_versions"
+
         users_domains = self.breakup_domains_by_users()
+        for domain, user in users_domains.iteritems():
+            if users_domains[domain] is not None:
+                print(domain + ' :: ' + users_domains[domain])
 
         vhost_php_versions = self.call(api, cmd, module=module)
         list_of_vhosts = []
@@ -238,12 +229,12 @@ class API():
         user_domains = self.breakup_domains_by_users()
         for key, value in user_domains.iteritems():
             if self.current_user == 'root':
-                self.ini_getter(key, value)
+                self.ini_getter(value, key)
             else:
                 x = 0
-                while x < len(value):
-                    if self.current_user_owns_this_domain(value[x]):
-                        self.ini_getter(self.current_user, value[x])
+                while x < len(key):
+                    if self.current_user_owns_this_domain(key[x]):
+                        self.ini_getter(self.current_user, key[x])
                     else:
                         print('\nDomain ' + value[x] + ' is not owned by this user --skipping...\n')
                     x += 1
@@ -252,12 +243,12 @@ class API():
         user_domains = self.breakup_domains_by_users()
         for key, value in user_domains.iteritems():
             if self.current_user == 'root':
-                self.ini_setter(key, value)
+                self.ini_setter(value, key)
             else:
                 x = 0
                 while x < len(value):
-                    if self.current_user_owns_this_domain(value[x]):
-                        self.ini_setter(self.current_user, value[x])
+                    if self.current_user_owns_this_domain(key[x]):
+                        self.ini_setter(self.current_user, key[x])
                     else:
                         print('\nDomain ' + value[x] + ' is not owned by this user --skipping...\n')
                     x += 1
@@ -280,11 +271,11 @@ class API():
         user_domains = self.breakup_domains_by_users()
         for key, value in user_domains.iteritems():
             if self.current_user == 'root':
-                self.ini_editor(key, value)
+                self.ini_editor(value, key)
             else:
                 x = 0
-                while x < len(value):
-                    if self.current_user_owns_this_domain(value[x]):
+                while x < len(key):
+                    if self.current_user_owns_this_domain(key[x]):
                         self.ini_editor(self.current_user, value[x])
                 
 
