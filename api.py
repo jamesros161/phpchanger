@@ -48,11 +48,11 @@ class API():
 
     def breakup_domains_by_users(self):
         domains_to_check = self.args.domains
+        user_domains = {}
         '''build list from domains into list of matching users, and their matching domains'''
         if self.current_user == "root":
             whmapi_domain_info = self.call("whmapi1", cmd="get_domain_info")
             x = 0
-            user_domains = {}
             while x < len(whmapi_domain_info['data']['domains']):
                 if whmapi_domain_info['data']['domains'][x]['domain'] in domains_to_check:
                     user_domains[whmapi_domain_info['data']['domains'][x]['user']] = whmapi_domain_info['data']['domains'][x]['domain']
