@@ -85,7 +85,6 @@ class API():
             api = "uapi"
             module = "LangPHP"
             cmd = "php_set_vhost_versions"
-            params = []
 
             # args.fpm ends up true if neither --fpm, --nofpm are given
             if self.args.fpm is not True:
@@ -100,7 +99,7 @@ class API():
                 php_id = self.args.version
 
             if php_id in installed_php_versions or php_id == "inherit":
-                params[0] = " version=" + php_id
+                params = [" version=" + php_id]
             else:
                 sys.exit("Provided PHP version " + php_id + " is not installed. Currently installed:\n" + '\n'.join(installed_php_versions))
 
