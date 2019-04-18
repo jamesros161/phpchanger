@@ -251,7 +251,7 @@ class API():
             params=params)
         i = 2
         while i < len(params):
-            print(params[i].strip('='))
+            print(params[i].split('='))
             print(params[i][1])
             i += 1
         dir_string = ', '.join(params[2:]).replace('%3A', ' = ')
