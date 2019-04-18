@@ -23,12 +23,14 @@ except ImportError:
 parser = Parser()
 args = parser.argparser.parse_args()
 current_user = getuser()
+api = API(args)
 
 
 def main():
 
-    print(args.mngr_subparser)
-
+    if args.mngr_subparser == 'get':
+        api.manager_get()
+     
     #determine_uapi_access()
     #print(run_cmd('whmapi1','listaccts', []))
     #print(api.call('uapi','domains_data',[],module='DomainInfo'))
