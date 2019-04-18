@@ -40,8 +40,7 @@ class API():
         print vhost_php_versions
         #check_api_return_for_issues(vhost_php_versions, cmd_type)
 
-        """
-        for vhost in (vhost for vhost in vhost_php_versions['result']['data'] if vhost['vhost'] in domains):
+        for vhost in (vhost for vhost in vhost_php_versions['result']['data'] if vhost['vhost'] in self.args.domains):
             print
             print vhost['vhost'] + ":"
             if "system_default" in vhost['phpversion_source']:
@@ -53,4 +52,3 @@ class API():
                 print "PHP-FPM Pool, Max Children: " + str(vhost['php_fpm_pool_parms']['pm_max_children'])
                 print "PHP-FPM Pool, Process Idle Timeout: " + str(vhost['php_fpm_pool_parms']['pm_process_idle_timeout'])
                 print "PHP-FPM Pool, Max Requests: " + str(vhost['php_fpm_pool_parms']['pm_max_requests'])
-        """
