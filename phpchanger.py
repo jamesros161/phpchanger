@@ -40,6 +40,8 @@ def main():
             api.ini_get()
         if args.ini_subparser == 'set':
             api.ini_set()
+        if args.ini_subparser == 'edit':
+            api.ini_edit()
      
     #determine_uapi_access()
     #print(run_cmd('whmapi1','listaccts', []))
