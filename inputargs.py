@@ -23,7 +23,7 @@ class Parser():
         self.create_primary_subparsers()
         self.create_mngr_subparsers()
         self.create_ini_subparsers()
-
+        
         self.api = API(self.argparser.parse_args)
  
     def create_parent_parsers(self):
