@@ -16,6 +16,8 @@ class API():
         self.current_user = getuser()
         self.args = parser_args
 
+    ### GENERAL API METHODS ####
+
     def check_api_return_for_issues(self, api_return, cmd_type):
         if cmd_type == "whmapi1":
             #print(cmd_type)
@@ -73,6 +75,20 @@ class API():
             print(error)
             sys.exit(api + ' Command Failed to Run')
 
+    def get_php_id(self):
+        if self.args.version:
+            installed_php_versions = self.get_installed_php_versions()
+            # if user gave us digits, prefix ea-php, else we assume the user gave a full php ID.
+            try:
+                php_id = "ea-php" + str(int(self.args.version))
+            except ValueError:
+                php_id = self.args.version
+
+            if php_id in installed_php_versions or php_id == "inherit":
+                return "version=" + php_id
+            else:
+                sys.exit("Provided PHP version " + php_id + " is not installed. Currently installed:\n" + '\n'.join(installed_php_versions))
+
     def get_installed_php_versions(self):
         if self.current_user == 'root':
             installed_php_versions = self.call("whmapi1", cmd="php_get_installed_versions")
@@ -94,15 +110,14 @@ class API():
                     user = self.current_user
                 else:
                     user = None
-                    
+
             if user is not None:
                 users_domains[domain] = user
             else:
                 print("\n" + domain + " Either does not exist, " 
                     "or is not owned by the user calling this function --skipping\n"
                     )
-            i += 1
-            
+            i += 1            
 
         return users_domains
     
@@ -119,6 +134,8 @@ class API():
             return True
         else:
             return False
+
+    ### MANAGER STUFF AND THINGS ###
         
     def manager_get(self):
         api = "uapi"
@@ -175,20 +192,8 @@ class API():
         else:
             self.call('uapi', cmd=cmd, module='LangPHP', params=params)
         print('The PHP version for the selected domains has been set to ' + self.php_id)
-   
-    def get_php_id(self):
-        if self.args.version:
-            installed_php_versions = self.get_installed_php_versions()
-            # if user gave us digits, prefix ea-php, else we assume the user gave a full php ID.
-            try:
-                php_id = "ea-php" + str(int(self.args.version))
-            except ValueError:
-                php_id = self.args.version
 
-            if php_id in installed_php_versions or php_id == "inherit":
-                return "version=" + php_id
-            else:
-                sys.exit("Provided PHP version " + php_id + " is not installed. Currently installed:\n" + '\n'.join(installed_php_versions))
+    ### INI STUFF AND THINGS ###                
 
     def ini_getter(self,user,domain):
         params = ['type=vhost', 'vhost=' + domain]
