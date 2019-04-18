@@ -89,7 +89,8 @@ class API():
                 x += 1
         else:
             user_domains[self.current_user] = domains_to_check
-        print(len(user_domains))
+        if len(user_domains) == 0:
+            sys.exit('There are no domains on the server matching your request')
         return user_domains
     
     def current_user_owns_this_domain(self, domain):
