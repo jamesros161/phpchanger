@@ -94,6 +94,7 @@ class API():
         #    sys.exit('There are no domains on the server matching your request')
         x = 0
         users_domains = {}
+        print(self.args.domains)
         print(len(self.args.domains))
         while x < len(self.args.domains):
             domain = self.args.domains[x]
