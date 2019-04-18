@@ -114,10 +114,9 @@ class API():
 
         users_domains = self.breakup_domains_by_users()
         for domain , user in users_domains.iteritems():
-            print(domain)
-            print(users_domains[domain])
+            print(domain + " :: " + user)
             if users_domains[domain] is not None:
-                vhost_php_versions = self.call(api, user=users_domains[domain], cmd=cmd, module=module)
+                vhost_php_versions = self.call(api, user=user, cmd=cmd, module=module)
                 for vhost in (vhost for vhost in vhost_php_versions['result']['data'] if vhost['vhost'] == users_domains[domain]):          
                     print vhost['vhost'] + ":"
                     if "system_default" in vhost['phpversion_source']:
@@ -130,8 +129,8 @@ class API():
                         print "PHP-FPM Pool, Process Idle Timeout: " + str(vhost['php_fpm_pool_parms']['pm_process_idle_timeout'])
                         print "PHP-FPM Pool, Max Requests: " + str(vhost['php_fpm_pool_parms']['pm_max_requests'])
             else:
-                print(domain + " Either does not exist, " 
-                    "or is not owned by the user calling this function"
+                print("\n" + domain + " Either does not exist, " 
+                    "or is not owned by the user calling this function --skipping\n"
                     )
 
         vhost_php_versions = self.call(api, cmd, module=module)
