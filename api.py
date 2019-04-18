@@ -32,7 +32,7 @@ class API():
             sys.exit(error)
 
     def get_installed_php_versions(self):
-        uapi_installed_php_versions = self.call("uapi", module="LangPHP", cmd="php_get_installed_versions", params=['--user=' + self.current_user])
+        uapi_installed_php_versions = self.call("uapi", module="LangPHP", cmd="php_get_installed_versions")
         #check_api_return_for_issues(uapi_installed_php_versions, "uapi")
 
         return uapi_installed_php_versions['result']['data']['versions']
