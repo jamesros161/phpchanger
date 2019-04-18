@@ -198,7 +198,7 @@ class API():
         php_ini_settings = self.call('uapi', 
             user=user, module='LangPHP', 
             cmd='php_ini_get_user_content', params=params)
-        print(php_ini_sttings)
+        print(php_ini_settings)
         metadata = php_ini_settings['result']['metadata']['LangPHP']
         self.format_title(metadata['vhost'] + " (" + metadata['path'] + ")")
         print(unescape(php_ini_settings['result']['data']['content']))
