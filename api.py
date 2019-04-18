@@ -8,7 +8,7 @@ class API():
         self.current_user = getuser()
         self.args = parser_args
 
-    def call(self, api,cmd,params=[],module=None):
+    def call(self, api,cmd='',params=[],module=None):
         if api == 'whmapi1' and self.current_user != 'root':
             sys.exit('WHMAPI1 commands must be run as root.')
         if api == 'whmapi1' and self.current_user == 'root':
@@ -30,6 +30,12 @@ class API():
         else:
             print('Command Failed to Run')
             sys.exit(error)
+
+    def get_installed_php_versions(self):
+        uapi_installed_php_versions = self.call("uapi", module="LangPHP", cmd="php_get_installed_versions", params=['--user=' + self.current_user])
+        #check_api_return_for_issues(uapi_installed_php_versions, "uapi")
+
+        return uapi_installed_php_versions['result']['data']['versions']
 
     def manager_get(self):
         api = "uapi"
@@ -74,35 +80,36 @@ class API():
                 params ="php_fpm=0"
             for domain in self.args.domains:
                 params.append("vhost=" + domain)
-            print(self.call(api, cmd, params))
-        """
+            print(self.call(api, cmd=cmd, params=params))
         else:
-            cmd_type = "uapi"
-            cmd = "uapi LangPHP php_set_vhost_versions"
+            api = "uapi"
+            module = "LangPHP"
+            cmd = "php_set_vhost_versions"
 
             # args.fpm ends up true if neither --fpm, --nofpm are given
-            if args.fpm is not True:
+            if self.args.fpm is not True:
                 warnings.warn("Adjusting PHP-FPM configuration not possible without root. Skipping that request...")
-        if args.version:
-            installed_php_versions = get_installed_php_versions(user_arg)
+            if self.args.version:
+                installed_php_versions = self.get_installed_php_versions()
 
             # if user gave us digits, prefix ea-php, else we assume the user gave a full php ID.
             try:
-                php_id = "ea-php" + str(int(args.version))
+                php_id = "ea-php" + str(int(self.args.version))
             except ValueError:
-                php_id = args.version
+                php_id = self.args.version
 
             if php_id in installed_php_versions or php_id == "inherit":
                 cmd += " version=" + php_id
             else:
                 sys.exit("Provided PHP version " + php_id + " is not installed. Currently installed:\n" + '\n'.join(installed_php_versions))
 
-        for domain in domains:
+        for domain in self.args.domains:
             cmd += " vhost=" + domain
 
-        cmd_return = run_cmd_and_parse_its_yaml_return(cmd)
-        check_api_return_for_issues(cmd_return, cmd_type)
-
+        cmd_return = self.call(api, module=module, cmd=cmd, params=params)
+        print(cmd_return)
+        #check_api_return_for_issues(cmd_return, cmd_type)
+    """
     users_doms_to_check = breakup_domains_by_users(args.domains)
     for user_doms in users_doms_to_check:
         uapi_user_arg = get_user_arg(user_doms["user"])
