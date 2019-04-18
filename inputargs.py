@@ -67,16 +67,14 @@ class Parser():
             help=self.helpstr.mngr_get_parser,
             parents=[self.dom_parser],
             epilog=self.epilogs.mngr_get_parser,
-            formatter_class=Raw,
-            dest='mngr_get_parser'
+            formatter_class=Raw
         )
 
         self.mngr_set_parser = self.mngr_subparser.add_parser( 'set',
             help=self.helpstr.mngr_set_parser,
             parents=[self.dom_parser, self.check_parser],
             epilog=self.epilogs.mngr_set_parser,
-            formatter_class=Raw,
-            dest='mngr_set_parser'
+            formatter_class=Raw
         )
 
         self.create_mngr_set_args()
