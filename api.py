@@ -18,22 +18,30 @@ class API():
 
     def check_api_return_for_issues(self, api_return, cmd_type):
         if cmd_type == "whmapi1":
+            print(cmd_type)
             # kill the script if these
             if api_return['metadata']['version'] != 1:
+                print(api_return['metadata']['version'])
                 sys.exit("This script not tested with whmapi version " +  api_return['metadata']['version'] + "expected 1 instead, exiting.")
             if api_return['metadata']['result'] != 1:
+                print(api_return['metadata']['version'])
                 sys.exit("whmapi1 returned error flag with this reason, exiting:\n" + api_return['metadata']['reason'])
         elif cmd_type == "uapi":
+            print(cmd_type)
             # kill the script if these
             if api_return['apiversion'] != 3:
+                print(api_return['apiversion'])
                 sys.exit("This script not tested with uapi version " + api_return['apiversion'] + "expected 3 instead, exiting.")
             if api_return['result']['errors'] is not None:
+                print(api_return['result']['errors'])
                 sys.exit("uapi returned this error, exiting:\n" + '\n'.join(error for error in api_return['result']['errors']))
 
             # warn the user if these
             if api_return['result']['messages'] is not None:
+                print(api_return['result']['messages'])
                 warnings.warn("uapi returned this message:\n" + '\n'.join(message for message in api_return['result']['messages']))
             if api_return['result']['warnings'] is not None:
+                print(api_return['result']['warnings'])
                 warnings.warn("uapi returned this warning:\n" + '\n'.join(warning for warning in api_return['result']['warnings']))
         else:
             print("Unrecognized cmd_type, can't check.")
@@ -177,6 +185,14 @@ class API():
         metadata = php_ini_settings['result']['metadata']['LangPHP']
         print(metadata['vhost'] + " (" + metadata['path'] + "):\n")
         print(unescape(php_ini_settings['result']['data']['content']))
+    
+    def ini_setter(self,user,domain):
+        params = ['type=vhost', 'vhost=' + domain]
+        for index, setting in enumerate(self.args.setting, start=1):
+            params.append("directive-" + str(index) + "=" + setting[0] + "%3A" + setting[1])
+        print (self.call('uapi', user=user, 
+            module='LangPHP', cmd='php_ini_set_user_basic_directives', 
+            params=params))
 
     def ini_get(self):
         user_domains = self.breakup_domains_by_users()
@@ -191,14 +207,6 @@ class API():
                     else:
                         print('\nDomain ' + value[x] + ' is not owned by this user --skipping...\n')
                     x += 1
-    
-    def ini_setter(self,user,domain):
-        params = ['type=vhost', 'vhost=' + domain]
-        for index, setting in enumerate(self.args.setting, start=1):
-            params.append("directive-" + str(index) + "=" + setting[0] + "%3A" + setting[1])
-        print (self.call('uapi', user=user, 
-            module='LangPHP', cmd='php_ini_set_user_basic_directives', 
-            params=params))
 
     def ini_set(self):
         user_domains = self.breakup_domains_by_users()
@@ -214,7 +222,7 @@ class API():
                         print('\nDomain ' + value[x] + ' is not owned by this user --skipping...\n')
                     x += 1
     
-    def editor(self, user, domain):
+    def ini_editor(self, user, domain):
         params = ['type=vhost', 'vhost=' + domain]
         php_ini_settings = self.call('uapi', user=user, module='LangPHP', cmd='php_ini_get_user_content', params=params)
         contents_to_edit = tempfile.NamedTemporaryFile(suffix=".tmp")
@@ -232,12 +240,12 @@ class API():
         user_domains = self.breakup_domains_by_users()
         for key, value in user_domains.iteritems():
             if self.current_user == 'root':
-                self.editor(key, value)
+                self.ini_editor(key, value)
             else:
                 x = 0
                 while x < len(value):
                     if self.current_user_owns_this_domain(value[x]):
-                        self.editor(self.current_user, value[x])
+                        self.ini_editor(self.current_user, value[x])
                 
 
     
