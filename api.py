@@ -20,7 +20,7 @@ class API():
         if cmd_type == "whmapi1":
             print(cmd_type)
             # kill the script if these
-            print(api_return['metadata']['version'])
+            print(api_return['metadata']['reason'])
             if api_return['metadata']['version'] != 1:
                 sys.exit("This script not tested with whmapi version " +  api_return['metadata']['version'] + "expected 1 instead, exiting.")
             print(api_return['metadata']['result'])
