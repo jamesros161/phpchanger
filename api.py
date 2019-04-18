@@ -125,18 +125,20 @@ class API():
             list_of_matching_vhosts = []
             for vhost in (vhost for vhost in vhost_php_versions['result']['data'] if vhost['vhost'] in self.args.domains):
                 list_of_matching_vhosts.append(vhost['vhost'])
-                print(len(list_of_matching_vhosts))
-            for vhost in (vhost for vhost in vhost_php_versions['result']['data'] if vhost['vhost'] in self.args.domains):
-                print vhost['vhost'] + ":"
-                if "system_default" in vhost['phpversion_source']:
-                    print "PHP Version: inherit (" + vhost['version'] + ")"
-                else:
-                    print "PHP Version: " + vhost['version']
-                print "PHP-FPM Status: " + ("Enabled" if vhost['php_fpm'] == 1 else "Disabled")
-                if vhost['php_fpm'] == 1:
-                    print "PHP-FPM Pool, Max Children: " + str(vhost['php_fpm_pool_parms']['pm_max_children'])
-                    print "PHP-FPM Pool, Process Idle Timeout: " + str(vhost['php_fpm_pool_parms']['pm_process_idle_timeout'])
-                    print "PHP-FPM Pool, Max Requests: " + str(vhost['php_fpm_pool_parms']['pm_max_requests'])
+            if len(list_of_matching_vhosts) == 0:
+                sys.exit('No vhosts match your query') 
+            else:
+                for vhost in (vhost for vhost in vhost_php_versions['result']['data'] if vhost['vhost'] in self.args.domains):          
+                    print vhost['vhost'] + ":"
+                    if "system_default" in vhost['phpversion_source']:
+                        print "PHP Version: inherit (" + vhost['version'] + ")"
+                    else:
+                        print "PHP Version: " + vhost['version']
+                    print "PHP-FPM Status: " + ("Enabled" if vhost['php_fpm'] == 1 else "Disabled")
+                    if vhost['php_fpm'] == 1:
+                        print "PHP-FPM Pool, Max Children: " + str(vhost['php_fpm_pool_parms']['pm_max_children'])
+                        print "PHP-FPM Pool, Process Idle Timeout: " + str(vhost['php_fpm_pool_parms']['pm_process_idle_timeout'])
+                        print "PHP-FPM Pool, Max Requests: " + str(vhost['php_fpm_pool_parms']['pm_max_requests'])
 
     def manager_set(self):
         if self.current_user == "root":
