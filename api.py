@@ -222,6 +222,7 @@ class API():
                 uri_encoded_contents = urllib.quote(contents_to_edit.read(), safe='')
                 setcmd = 'php_ini_set_user_content'
                 print(uri_encoded_contents)
-                setparams = params.append('content=' + uri_encoded_contents)
+                setparams = params
+                setparams.append('content=' + uri_encoded_contents)
                 new_php_ini_settings = self.call(api, user=user, module=module, cmd=setcmd, params=setparams)
                 print(new_php_ini_settings)
