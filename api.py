@@ -90,10 +90,11 @@ class API():
             if self.current_user == 'root':
                 user = self.call('whmapi1', cmd='getdomainowner',params=['domain=' + domain])['data']['user']
             else:
-                user = self.call('uapi', module='DomainInfo', 
-                    cmd='single_domain_data', 
-                    params=['domain=' + domain])['result']['data']['user']
-        
+                if self.current_user_owns_this_domain(domain):
+                    user = self.current_user
+                else:
+                    user = None
+                    
             if user is not None:
                 users_domains[domain] = user
             else:
