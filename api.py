@@ -92,15 +92,17 @@ class API():
         #    user_domains[self.current_user] = domains_to_check
         #if len(user_domains) == 0:
         #    sys.exit('There are no domains on the server matching your request')
-        x = 0
+        
         users_domains = {}
         print(self.args.domains)
         print(len(self.args.domains))
-        while x < len(self.args.domains):
-            domain = self.args.domains[x]
+        i = 0
+        while i < len(self.args.domains):
+            domain = self.args.domains[i]
             user = self.call('whmapi1', cmd='getdomainowner',params=['domain=' + domain])['data']['user']
-            users_domains[user] = domain
-            x += 1
+            users_domains[domain] = user
+            i += 1
+
         print(users_domains)
         return users_domains
     
