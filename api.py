@@ -255,7 +255,7 @@ class API():
             params[i] = params[i][1]
             i += 1
         dir_string = ', '.join(params[2:]).replace('%3A', ' = ')
-        print("Set php-ini directives:  " + dir_string + " for domain " + domain)
+        print("Set php-ini directives:  " + dir_string + " :: for domain " + domain)
             
     def ini_editor(self, user, domain):
         params = ['type=vhost', 'vhost=' + domain]
@@ -263,7 +263,8 @@ class API():
         contents_to_edit = tempfile.NamedTemporaryFile(suffix=".tmp")
         contents_to_edit.write(unescape(php_ini_settings['result']['data']['content']))
         contents_to_edit.flush()
-        call([os.environ.get('EDITOR', 'nano'), contents_to_edit.name])
+        call(['nano' , contents_to_edit.name])
+        #call([os.environ.get('EDITOR', 'nano'), contents_to_edit.name])
         contents_to_edit.seek(0)
         uri_encoded_contents = urllib.quote(contents_to_edit.read(), safe='')
         setparams = params
