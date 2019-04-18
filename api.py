@@ -256,7 +256,18 @@ class API():
             i += 1
         dir_string = ', '.join(params[2:]).replace('%3A', ' = ')
         print("Set php-ini directives:  " + dir_string + " :: for domain " + domain)
-            
+
+    def ini_edit(self):
+        user_domains = self.breakup_domains_by_users()
+        for key, value in user_domains.iteritems():
+            if self.current_user == 'root':
+                self.ini_editor(value, key)
+            else:
+                x = 0
+                while x < len(key):
+                    if self.current_user_owns_this_domain(key[x]):
+                        self.ini_editor(self.current_user, value[x])
+
     def ini_editor(self, user, domain):
         params = ['type=vhost', 'vhost=' + domain]
         php_ini_settings = self.call('uapi', user=user, module='LangPHP', cmd='php_ini_get_user_content', params=params)
@@ -269,19 +280,9 @@ class API():
         uri_encoded_contents = urllib.quote(contents_to_edit.read(), safe='')
         setparams = params
         setparams.append('content=' + uri_encoded_contents)
-        new_php_ini_settings = self.call('uapi', user=user, module='LangPHP', cmd='php_ini_set_user_content', params=setparams)
-        print(new_php_ini_settings)
-
-    def ini_edit(self):
-        user_domains = self.breakup_domains_by_users()
-        for key, value in user_domains.iteritems():
-            if self.current_user == 'root':
-                self.ini_editor(value, key)
-            else:
-                x = 0
-                while x < len(key):
-                    if self.current_user_owns_this_domain(key[x]):
-                        self.ini_editor(self.current_user, value[x])
-                
+        self.call('uapi', user=user, module='LangPHP', cmd='php_ini_set_user_content', params=setparams)
+        print('PHP.INI saved for doamin :: ' + domain)
+        self.ini_getter(user, domain)
+        #print(new_php_ini_settings)
 
     
