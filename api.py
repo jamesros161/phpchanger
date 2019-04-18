@@ -232,6 +232,8 @@ class API():
         user_domains = self.breakup_domains_by_users()
         for domain, user in user_domains.iteritems():
             self.ini_editor(user, domain)
+        for domain, user in user_domains.iteritems():
+            self.ini_getter(user, domain)
 
     def ini_editor(self, user, domain):
         params = ['type=vhost', 'vhost=' + domain]
@@ -247,6 +249,6 @@ class API():
         setparams.append('content=' + uri_encoded_contents)
         self.call('uapi', user=user, module='LangPHP', cmd='php_ini_set_user_content', params=setparams)
         print('PHP.INI saved for doamin :: ' + domain)
-        self.ini_getter(user, domain)
+
 
     
