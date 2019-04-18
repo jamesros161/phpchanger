@@ -159,8 +159,6 @@ class API():
                         print("PHP-FPM Pool, Max Requests: " + str(vhost['php_fpm_pool_parms']['pm_max_requests']) + "\n")
                 
     def manager_set(self):
-        
-        #api = "whmapi1"
         cmd = "php_set_vhost_versions"
         params = []
         if self.current_user == "root":    
@@ -195,29 +193,13 @@ class API():
             self.call('whmapi1', cmd=cmd, params=params)
         else:
             self.call('uapi', cmd=cmd, module='LangPHP', params=params)
+
         if (self.args.fpm) or (isinstance(self.args.fpm, (list,))):
             print('The PHP-FPM Configuration has been updated')
         if self.args.version is not None:
             print('The PHP version for the selected domains has been set to ' + self.php_id)
 
     ### INI STUFF AND THINGS ###                
-
-    def ini_getter(self,user,domain):
-        params = ['type=vhost', 'vhost=' + domain]
-        php_ini_settings = self.call('uapi', 
-            user=user, module='LangPHP', 
-            cmd='php_ini_get_user_content', params=params)
-        metadata = php_ini_settings['result']['metadata']['LangPHP']
-        print(metadata['vhost'] + " (" + metadata['path'] + "):\n")
-        print(unescape(php_ini_settings['result']['data']['content']))
-    
-    def ini_setter(self,user,domain):
-        params = ['type=vhost', 'vhost=' + domain]
-        for index, setting in enumerate(self.args.setting, start=1):
-            params.append("directive-" + str(index) + "=" + setting[0] + "%3A" + setting[1])
-        print (self.call('uapi', user=user, 
-            module='LangPHP', cmd='php_ini_set_user_basic_directives', 
-            params=params))
 
     def ini_get(self):
         user_domains = self.breakup_domains_by_users()
@@ -233,6 +215,19 @@ class API():
                         print('\nDomain ' + value[x] + ' is not owned by this user --skipping...\n')
                     x += 1
 
+    def ini_getter(self,user,domain):
+        params = ['type=vhost', 'vhost=' + domain]
+        php_ini_settings = self.call('uapi', 
+            user=user, module='LangPHP', 
+            cmd='php_ini_get_user_content', params=params)
+        metadata = php_ini_settings['result']['metadata']['LangPHP']
+        title = metadata['vhost'] + " (" + metadata['path'] + "):\n"
+        h_border = '{s:{c}^{n}}'.format(s='#', n=len(title), c='#')
+        print("\n" + h_border + "\n")
+        print(title)
+        print("\n" + h_border + "\n")
+        print(unescape(php_ini_settings['result']['data']['content']))
+
     def ini_set(self):
         user_domains = self.breakup_domains_by_users()
         for key, value in user_domains.iteritems():
@@ -246,6 +241,14 @@ class API():
                     else:
                         print('\nDomain ' + value[x] + ' is not owned by this user --skipping...\n')
                     x += 1
+
+    def ini_setter(self,user,domain):
+        params = ['type=vhost', 'vhost=' + domain]
+        for index, setting in enumerate(self.args.setting, start=1):
+            params.append("directive-" + str(index) + "=" + setting[0] + "%3A" + setting[1])
+        print (self.call('uapi', user=user, 
+            module='LangPHP', cmd='php_ini_set_user_basic_directives', 
+            params=params))
     
     def ini_editor(self, user, domain):
         params = ['type=vhost', 'vhost=' + domain]
