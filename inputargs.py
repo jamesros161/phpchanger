@@ -59,7 +59,8 @@ class Parser():
 
     def create_mngr_subparsers(self):
         self.mngr_subparser = self.mngr_parser.add_subparsers(
-            help=self.helpstr.mngr_subparsers
+            help=self.helpstr.mngr_subparsers,
+            dest='mngr_subparser'
         )
 
         self.mngr_get_parser = self.mngr_subparser.add_parser( 'get',
