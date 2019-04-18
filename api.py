@@ -76,10 +76,10 @@ class API():
     def get_installed_php_versions(self):
         if self.current_user == 'root':
             installed_php_versions = self.call("whmapi1", cmd="php_get_installed_versions")
+            return installed_php_versions['data']['versions']
         else:
             installed_php_versions = self.call("uapi", module="LangPHP", cmd="php_get_installed_versions")
-
-        return installed_php_versions['result']['data']['versions']
+            return installed_php_versions['result']['data']['versions']
 
     def breakup_domains_by_users(self):
         
