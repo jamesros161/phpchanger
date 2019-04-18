@@ -251,9 +251,9 @@ class API():
             params=params)
         i = 2
         while i < len(params):
-            params[i].strip('=')
-            params[i] = params[i][1]
-            i +=1
+            print(params[i].strip('='))
+            print(params[i][1])
+            i += 1
         dir_string = ', '.join(params[2:]).replace('%3A', ' = ')
         print("Set php-ini directives:  " + dir_string + " for domain " + domain)
             
