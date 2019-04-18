@@ -198,6 +198,8 @@ class API():
                 while x < len(value):
                     if self.current_user_owns_this_domain(value[x]):
                         params = ['type=vhost', 'vhost=' + value[x]]
+                        for index, setting in enumerate(self.args.setting, start=1):
+                            params.append("directive-" + str(index) + "=" + setting[0] + "%3A" + setting[1])
                         print (self.call(api, user=user, module=module, cmd=cmd, params=params))
                     else:
                         print('\nDomain ' + value[x] + ' is not owned by this user --skipping...\n')
