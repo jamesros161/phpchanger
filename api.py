@@ -1,7 +1,6 @@
-import json, sys
+import json, sys, os, warnings, tempfile, urllib
 from getpass import getuser
-from subprocess import Popen, PIPE
-import warnings
+from subprocess import Popen, PIPE, call
 
 try:
     from html import unescape  # python 3.4+
@@ -204,27 +203,24 @@ class API():
                     else:
                         print('\nDomain ' + value[x] + ' is not owned by this user --skipping...\n')
                     x += 1
-    """
-    def ini_edit(self, domain, user_arg):
+    
+    def ini_edit(self):
         api = "uapi"
-        module = "LangPHP php_ini_get_user_content type=vhost vhost=" + domain
-
-        php_ini_settings = run_cmd_and_parse_its_yaml_return(cmd)
-        check_api_return_for_issues(php_ini_settings, cmd_type)
-
-        contents_to_edit = tempfile.NamedTemporaryFile(suffix=".tmp")
-        contents_to_edit.write(unescape(php_ini_settings['result']['data']['content']))
-        contents_to_edit.flush()
-        call([os.environ.get('EDITOR', 'nano'), contents_to_edit.name])
-        contents_to_edit.seek(0)
-
-        uri_encoded_contents = urllib.quote(contents_to_edit.read(), safe='')
-
-        print uri_encoded_contents
-
-        cmd_type = "uapi"
-        cmd = "uapi" + user_arg + " LangPHP php_ini_set_user_content type=vhost vhost=" + domain + " content=" + uri_encoded_contents
-
-        php_ini_settings = run_cmd_and_parse_its_yaml_return(cmd)
-        check_api_return_for_issues(php_ini_settings, cmd_type)
-    """
+        module = "LangPHP"
+        cmd = "php_ini_get_user_content"
+        user_domains = self.breakup_domains_by_users()
+        for key, value in user_domains.iteritems():
+            user = key
+            if self.current_user == 'root':
+                params = ['type=vhost', 'vhost=' + value]
+                php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
+                contents_to_edit = tempfile.NamedTemporaryFile(suffix=".tmp")
+                contents_to_edit.write(unescape(php_ini_settings['result']['data']['content']))
+                contents_to_edit.flush()
+                call([os.environ.get('EDITOR', 'nano'), contents_to_edit.name])
+                contents_to_edit.seek(0)
+                uri_encoded_contents = urllib.quote(contents_to_edit.read(), safe='')
+                setcmd = 'php_ini_set_user_content'
+                setparams = params.append('content=' + uri_encoded_contents)
+                new_php_ini_settings = self.call(api, user=user, module=module, cmd=setcmd, params=setparams)
+                print(new_php_ini_settings)
