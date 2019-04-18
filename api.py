@@ -63,9 +63,15 @@ class API():
         return user_domains
     
     def current_user_owns_this_domain(self, domain):
-        
-        print(self.call('uapi', module='DomainInfo', 
-            cmd='list_domains', user=self.current_user))
+        users_domains = []
+        response = self.call('uapi', module='DomainInfo', 
+            cmd='list_domains', user=self.current_user)
+        data = response['result']['data']
+        users_domains.extend(data['parked_domains'])
+        users_domains.extend(data['addon_domains'])
+        users_domains.extend(data['main_domain'])
+        users_domains.extend(data['parked_domains'])
+        print(users_domains)
 
     def manager_get(self):
         api = "uapi"
