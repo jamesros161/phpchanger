@@ -89,7 +89,7 @@ class API():
                 x += 1
         else:
             user_domains[self.current_user] = domains_to_check
-        print(user_domains)
+        print(len(user_domains))
         return user_domains
     
     def current_user_owns_this_domain(self, domain):
