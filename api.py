@@ -150,6 +150,7 @@ class API():
         module = "LangPHP"
         cmd = "php_ini_get_user_content"
         domains = self.breakup_domains_by_users()
+        print(domains)
         for domain in domains['domains']:        
             params =['type=vhost', 'vhost=' + domain]
             php_ini_settings = self.call(api, module=module, cmd=cmd, params=params)
