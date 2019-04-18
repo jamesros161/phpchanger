@@ -163,6 +163,7 @@ class API():
                 params.append("vhost=" + domain)
             self.call(api, cmd=cmd, params=params)
             print('PHP version for domains '.join(self.args.domains) + ' has been set to ' + self.args.version)
+            
         else:
             api = "uapi"
             module = "LangPHP"
