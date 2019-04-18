@@ -99,12 +99,12 @@ class API():
                 php_id = self.args.version
 
             if php_id in installed_php_versions or php_id == "inherit":
-                cmd += " version=" + php_id
+                params[0] = " version=" + php_id
             else:
                 sys.exit("Provided PHP version " + php_id + " is not installed. Currently installed:\n" + '\n'.join(installed_php_versions))
 
         for domain in self.args.domains:
-            cmd += " vhost=" + domain
+            params.append(" vhost=" + domain)
 
         cmd_return = self.call(api, module=module, cmd=cmd, params=params)
         print(cmd_return)
