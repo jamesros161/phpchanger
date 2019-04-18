@@ -184,8 +184,9 @@ class API():
             params.append("vhost=" + domain)
 
         # if user gave us digits, prefix ea-php, else we assume the user gave a full php ID.
-        self.php_id = self.get_php_id()
-        params.append(self.php_id)
+        if self.args.version is not None:
+            self.php_id = self.get_php_id()
+            params.append(self.php_id)
 
         if self.current_user == "root":
             self.call('whmapi1', cmd=cmd, params=params)
