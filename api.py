@@ -71,10 +71,14 @@ class API():
         users_domains = users_domains + data['sub_domains']
         users_domains = users_domains + data['addon_domains']
         users_domains = users_domains + data['parked_domains']
+        if domain in users_domains:
+            return True
+        else:
+            return False
         #for value in data.iteritems:
         #    print(value)
         #users_domains = users_domains + data['main_domain']
-        print(users_domains)
+        #print(users_domains)
 
     def manager_get(self):
         api = "uapi"
@@ -167,7 +171,7 @@ class API():
             else:
                 x = 0
                 while x < len(value):
-                    self.current_user_owns_this_domain(value[x])
+                    print(self.current_user_owns_this_domain(value[x]))
                     params = ['type=vhost', 'vhost=' + value[x]]
                     
                     #php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
