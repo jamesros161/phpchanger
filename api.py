@@ -51,24 +51,16 @@ class API():
         '''build list from domains into list of matching users, and their matching domains'''
         if self.current_user == "root":
             whmapi_domain_info = self.call("whmapi1", cmd="get_domain_info")
-            print(whmapi_domain_info)
-            matching_domain_info = [domain_info for domain_info in whmapi_domain_info['data']['domains'] if domain_info['domain'] in domains_to_check]
-            matching_users = {domain_info["user"] for domain_info in matching_domain_info}
-        # transform list of matching domain info into dict of matching users and their own matching domains
-            return [
-                {
-                    "user": this_user,
-                    "domains": [domain_info["domain"] for domain_info in matching_domain_info if domain_info["user"] == this_user]
-                } for this_user in matching_users
-            ]
-
+            x = 0
+            user_domains = {}
+            while x < len(whmapi_domain_info['data']['domains']):
+                if whmapi_domain_info['data']['domains'][x]['domain'] in domains_to_check:
+                    user_domains[whmapi_domain_info['data']['domains'][x]['user']] = whmapi_domain_info['data']['domains'][x]['domain']
+                x += 1
         else:
-            return [
-                {
-                    "user": self.current_user,
-                    "domains": domains_to_check
-                }
-            ]
+            user_domains[self.current_user] = domains_to_check
+        
+        return user_domains
     
 
 
@@ -150,11 +142,12 @@ class API():
         api = "uapi"
         module = "LangPHP"
         cmd = "php_ini_get_user_content"
-        domains = self.breakup_domains_by_users()
-        print(domains)
-        for domain in domains[0]['domains']:        
+        user_domains = self.breakup_domains_by_users()
+        print(user_domains)
+        for user, domain in user_domains[0]['domains']:  
+            user = '--user=' + user     
             params =['type=vhost', 'vhost=' + domain]
-            php_ini_settings = self.call(api, module=module, cmd=cmd, params=params)
+            php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
             metadata = php_ini_settings['result']['metadata']['LangPHP']
             print(metadata['vhost'] + " (" + metadata['path'] + "):")
             print(unescape(php_ini_settings['result']['data']['content']))
@@ -170,8 +163,8 @@ class API():
                 params.append("directive-" + str(index) + "=" + setting[0] + "%3A" + setting[1])
                 cmd_return = self.call(api, module=module, cmd=cmd, params=params)
                 print(cmd_return)
-
-    def ini_edit(domain, user_arg):
+    """
+    def ini_edit(self, domain, user_arg):
         api = "uapi"
         module = "LangPHP php_ini_get_user_content type=vhost vhost=" + domain
 
@@ -193,4 +186,4 @@ class API():
 
         php_ini_settings = run_cmd_and_parse_its_yaml_return(cmd)
         check_api_return_for_issues(php_ini_settings, cmd_type)
-                
+    """
