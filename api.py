@@ -3,6 +3,15 @@ from getpass import getuser
 from subprocess import Popen, PIPE
 import warnings
 
+try:
+    from html import unescape  # python 3.4+
+except ImportError:
+    try:
+        from html.parser import HTMLParser  # python 3.x (<3.4)
+    except ImportError:
+        from HTMLParser import HTMLParser  # python 2.x
+    unescape = HTMLParser().unescape
+
 class API():
     def __init__(self, parser_args):
         self.current_user = getuser()
@@ -110,20 +119,17 @@ class API():
         cmd_return = self.call(api, module=module, cmd=cmd, params=params)
         print(cmd_return)
         #check_api_return_for_issues(cmd_return, cmd_type)
-    """
-    users_doms_to_check = breakup_domains_by_users(args.domains)
-    for user_doms in users_doms_to_check:
-        uapi_user_arg = get_user_arg(user_doms["user"])
-        doms_list = user_doms["domains"]
+    
+    def ini_get(self):
+        api = "uapi"
+        module = "LangPHP"
+        cmd = "php_ini_get_user_content"
+        params =['type=vhost', 'vhost=' + self.args.domains]
 
-        if args.action == "get":
-            manager_get(doms_list, uapi_user_arg)
-        elif args.action == "set":
-            manager_set(doms_list, uapi_user_arg)
+        php_ini_settings = self.call(api, module=module, cmd=cmd, params=params)
+        #check_api_return_for_issues(php_ini_settings, cmd_type)
 
-            print "\nSet command for user " + user_doms["user"] + " completed."
+        metadata = php_ini_settings['result']['metadata']['LangPHP']
 
-            if args.check is True:
-                print "Checking with manager get:"
-                manager_get(doms_list, uapi_user_arg)
-        """
+        print(metadata['vhost'] + " (" + metadata['path'] + "):")
+        print(unescape(php_ini_settings['result']['data']['content']))

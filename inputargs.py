@@ -108,7 +108,8 @@ class Parser():
     
     def create_ini_subparsers(self):
         self.ini_subparser = self.ini_parser.add_subparsers(
-            help=self.helpstr.ini_subparsers
+            help=self.helpstr.ini_subparsers,
+            dest='ini_subparser'
         )
 
         self.ini_get_parser = self.ini_subparser.add_parser( 'get',
