@@ -113,7 +113,12 @@ class API():
         api = "uapi"
         module = "LangPHP"
         cmd = "php_get_vhost_versions"
-
+        x = 0
+        while x < len(self.args.domains):
+            print(self.args.domains[x])
+            x += 1
+            
+        user = self.call('whmapi1', cmd='getdomainowner')
         vhost_php_versions = self.call(api, cmd, module=module)
         list_of_vhosts = []
         for vhost in vhost_php_versions['result']['data']:
