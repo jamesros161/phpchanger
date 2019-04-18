@@ -177,7 +177,7 @@ class API():
                         print(metadata['vhost'] + " (" + metadata['path'] + "):")
                         print(unescape(php_ini_settings['result']['data']['content']))
                     else:
-                        print('Domain ' + value[x] + ' is not owned by this user --skipping...')
+                        print('\nDomain ' + value[x] + ' is not owned by this user --skipping...\n')
                     x += 1
             
 
