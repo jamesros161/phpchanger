@@ -145,7 +145,7 @@ class API():
         user_domains = self.breakup_domains_by_users()
         print(user_domains)
         for key, value in user_domains.iteritems():  
-            user = '--user=' + key     
+            user = key     
             params =['type=vhost', 'vhost=' + value]
             php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
             metadata = php_ini_settings['result']['metadata']['LangPHP']
