@@ -114,7 +114,6 @@ class API():
 
         users_domains = self.breakup_domains_by_users()
         for domain , user in users_domains.iteritems():
-            print(domain + " :: " + user)
             if users_domains[domain] is not None:
                 vhost_php_versions = self.call(api, user=user, cmd=cmd, module=module)
                 for vhost in (vhost for vhost in vhost_php_versions['result']['data'] if vhost['vhost'] == users_domains[domain]):          
@@ -132,7 +131,7 @@ class API():
                 print("\n" + domain + " Either does not exist, " 
                     "or is not owned by the user calling this function --skipping\n"
                     )
-
+    """
         vhost_php_versions = self.call(api, cmd, module=module)
         list_of_vhosts = []
         for vhost in vhost_php_versions['result']['data']:
@@ -157,7 +156,7 @@ class API():
                         print "PHP-FPM Pool, Max Children: " + str(vhost['php_fpm_pool_parms']['pm_max_children'])
                         print "PHP-FPM Pool, Process Idle Timeout: " + str(vhost['php_fpm_pool_parms']['pm_process_idle_timeout'])
                         print "PHP-FPM Pool, Max Requests: " + str(vhost['php_fpm_pool_parms']['pm_max_requests'])
-
+    """
     def manager_set(self):
         if self.current_user == "root":
             api = "whmapi1"
