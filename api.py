@@ -246,10 +246,11 @@ class API():
         params = ['type=vhost', 'vhost=' + domain]
         for index, setting in enumerate(self.args.setting, start=1):
             params.append("directive-" + str(index) + "=" + setting[0] + "%3A" + setting[1])
-        print (self.call('uapi', user=user, 
+        self.call('uapi', user=user, 
             module='LangPHP', cmd='php_ini_set_user_basic_directives', 
-            params=params))
-    
+            params=params)
+        print("Set php-ini :" + ", ".join(params[2:]) + " for domain " + domain)
+            
     def ini_editor(self, user, domain):
         params = ['type=vhost', 'vhost=' + domain]
         php_ini_settings = self.call('uapi', user=user, module='LangPHP', cmd='php_ini_get_user_content', params=params)
