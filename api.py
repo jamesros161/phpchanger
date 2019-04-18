@@ -62,7 +62,10 @@ class API():
         
         return user_domains
     
-
+    def current_user_owns_this_domain(self, domain):
+        
+        print(self.call('uapi', module='DomainInfo', 
+            cmd='list_domains', user=self.current_user))
 
     def manager_get(self):
         api = "uapi"
@@ -155,9 +158,11 @@ class API():
             else:
                 x = 0
                 while x < len(value):
+                    self.current_user_owns_this_domain(value[x])
                     params = ['type=vhost', 'vhost=' + value[x]]
-                    php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
-                    print(php_ini_settings)
+                    
+                    #php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
+                    #print(php_ini_settings)
                     #metadata = php_ini_settings['result']['metadata']['LangPHP']
                     #print(metadata['vhost'] + " (" + metadata['path'] + "):")
                     #print(unescape(php_ini_settings['result']['data']['content']))
