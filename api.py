@@ -145,12 +145,23 @@ class API():
         user_domains = self.breakup_domains_by_users()
         print(user_domains)
         for key, value in user_domains.iteritems():  
-            user = key     
-            params = ['type=vhost', 'vhost=' + value]
-            php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
-            metadata = php_ini_settings['result']['metadata']['LangPHP']
-            print(metadata['vhost'] + " (" + metadata['path'] + "):")
-            print(unescape(php_ini_settings['result']['data']['content']))
+            user = key
+            if self.current_user == 'root':
+                params = ['type=vhost', 'vhost=' + value]
+                php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
+                metadata = php_ini_settings['result']['metadata']['LangPHP']
+                print(metadata['vhost'] + " (" + metadata['path'] + "):")
+                print(unescape(php_ini_settings['result']['data']['content']))
+            else:
+                x = 0
+                while x < len(value):
+                    params = ['type=vhost', 'vhost=' + value[x]]
+                    php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
+                    metadata = php_ini_settings['result']['metadata']['LangPHP']
+                    print(metadata['vhost'] + " (" + metadata['path'] + "):")
+                    print(unescape(php_ini_settings['result']['data']['content']))
+                    x += 1
+            
 
     def ini_set(self):
         api = "uapi"
