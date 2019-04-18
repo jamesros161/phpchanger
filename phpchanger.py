@@ -27,7 +27,7 @@ current_user = getuser()
 
 def main():
 
-    print(args.__dict__)
+    print(dir(args))
 
     #determine_uapi_access()
     #print(run_cmd('whmapi1','listaccts', []))
