@@ -249,7 +249,7 @@ class API():
         self.call('uapi', user=user, 
             module='LangPHP', cmd='php_ini_set_user_basic_directives', 
             params=params)
-        print("Set php-ini directives:  " + ", ".join(params[2:]).replace('%3A', '=') + " for domain " + domain)
+        print("Set php-ini directives:  " + ", ".join(params[2:]).replace('%3A', '=').split(str="=")[1:] + " for domain " + domain)
             
     def ini_editor(self, user, domain):
         params = ['type=vhost', 'vhost=' + domain]
