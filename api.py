@@ -201,6 +201,7 @@ class API():
                         print (self.call(api, user=user, module=module, cmd=cmd, params=params))
                     else:
                         print('\nDomain ' + value[x] + ' is not owned by this user --skipping...\n')
+                    x += 1
     """
     def ini_edit(self, domain, user_arg):
         api = "uapi"
