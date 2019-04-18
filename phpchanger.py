@@ -30,6 +30,8 @@ def main():
 
     if args.mngr_subparser == 'get':
         api.manager_get()
+    if args.mngr_subparser == 'set':
+        api.manager_set()
      
     #determine_uapi_access()
     #print(run_cmd('whmapi1','listaccts', []))
