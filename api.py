@@ -271,7 +271,7 @@ class API():
     def ini_editor(self, user, domain):
         params = ['type=vhost', 'vhost=' + domain]
         php_ini_settings = self.call('uapi', user=user, module='LangPHP', cmd='php_ini_get_user_content', params=params)
-        contents_to_edit = tempfile.NamedTemporaryFile(suffix=".tmp")
+        contents_to_edit = tempfile.NamedTemporaryFile(prefix=domain, suffix=".tmp")
         contents_to_edit.write(unescape(php_ini_settings['result']['data']['content']))
         contents_to_edit.flush()
         call(['nano' , contents_to_edit.name])
