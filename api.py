@@ -116,7 +116,6 @@ class API():
         cmd = "php_get_vhost_versions"
 
         vhost_php_versions = self.call(api, cmd, module=module)
-        print(vhost_php_versions)
         for vhost in vhost_php_versions['result']['data']:
             print(vhost)
         for vhost in (vhost for vhost in vhost_php_versions['result']['data'] if vhost['vhost'] in self.args.domains):
