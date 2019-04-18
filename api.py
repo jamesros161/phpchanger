@@ -1,15 +1,9 @@
 import json, sys, os, warnings, tempfile, urllib
 from getpass import getuser
 from subprocess import Popen, PIPE, call
+from HTMLParser import HTMLParser
 
-try:
-    from html import unescape  # python 3.4+
-except ImportError:
-    try:
-        from html.parser import HTMLParser  # python 3.x (<3.4)
-    except ImportError:
-        from HTMLParser import HTMLParser  # python 2.x
-    unescape = HTMLParser().unescape
+unescape = HTMLParser().unescape
 
 class API():
     def __init__(self, parser_args):
