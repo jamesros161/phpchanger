@@ -125,7 +125,6 @@ class API():
             list_of_matching_vhosts = []
             for vhost in (vhost for vhost in vhost_php_versions['result']['data'] if vhost['vhost'] in self.args.domains):
                 list_of_matching_vhosts.append(vhost['vhost'])
-            print(len(list_of_matching_vhosts))
             if len(list_of_matching_vhosts) == 0:
                 sys.exit('No vhosts match your query') 
             else:
