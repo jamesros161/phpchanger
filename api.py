@@ -134,11 +134,11 @@ class API():
                         print("PHP-FPM Pool, Max Requests: " + str(vhost['php_fpm_pool_parms']['pm_max_requests']) + "\n")
                 
     def manager_set(self):
-        if self.current_user == "root":
-            api = "whmapi1"
-            cmd = "php_set_vhost_versions"
-            params = []
-            
+        
+        #api = "whmapi1"
+        cmd = "php_set_vhost_versions"
+        params = []
+        if self.current_user == "root":    
             if isinstance(self.args.fpm, (list,)):
                 if self.args.version is None:
                     warnings.warn('Keep in mind that PHP-FPM will fail to enable if the PHP version is set to "inherit". This script doesnt check for that, hopefully you did.')
@@ -153,38 +153,24 @@ class API():
                 ]
             elif self.args.fpm is False:
                 params ="php_fpm=0"
+        
+        users_domains = self.breakup_domains_by_users()
+        for domain , user in users_domains.iteritems():
+            params.append("vhost=" + domain)
 
-            users_domains = self.breakup_domains_by_users()
-            for domain , user in users_domains.iteritems():
-                params.append("vhost=" + domain)
-            if self.args.version:
-                installed_php_versions = self.get_installed_php_versions()
-            # if user gave us digits, prefix ea-php, else we assume the user gave a full php ID.
-            try:
-                php_id = "ea-php" + str(int(self.args.version))
-            except ValueError:
-                php_id = self.args.version
+        # if user gave us digits, prefix ea-php, else we assume the user gave a full php ID.
+        self.php_id = self.get_php_id()
+        params.append(self.php_id)
 
-            if php_id in installed_php_versions or php_id == "inherit":
-                params.append("version=" + php_id)
-            else:
-                sys.exit("Provided PHP version " + php_id + " is not installed. Currently installed:\n" + '\n'.join(installed_php_versions))
-
-            self.call(api, cmd=cmd, params=params)
-            print('The PHP version for the selected domains has been set to ' + php_id)
-
+        if self.current_user == "root":
+            self.call('whmapi1', cmd=cmd, params=params)
         else:
-            api = "uapi"
-            module = "LangPHP"
-            cmd = "php_set_vhost_versions"
-            params = []
-
-            # args.fpm ends up true if neither --fpm, --nofpm are given
-            if self.args.fpm is not True:
-                warnings.warn("Adjusting PHP-FPM configuration not possible without root. Skipping that request...")
-            if self.args.version:
-                installed_php_versions = self.get_installed_php_versions()
-
+            self.call('uapi', cmd=cmd, module='LangPHP', params=params)
+        print('The PHP version for the selected domains has been set to ' + php_id)
+   
+    def get_php_id(self):
+        if self.args.version:
+            installed_php_versions = self.get_installed_php_versions()
             # if user gave us digits, prefix ea-php, else we assume the user gave a full php ID.
             try:
                 php_id = "ea-php" + str(int(self.args.version))
@@ -192,16 +178,10 @@ class API():
                 php_id = self.args.version
 
             if php_id in installed_php_versions or php_id == "inherit":
-                params.append("version=" + php_id)
+                return "version=" + php_id
             else:
                 sys.exit("Provided PHP version " + php_id + " is not installed. Currently installed:\n" + '\n'.join(installed_php_versions))
 
-            for domain in self.args.domains:
-                params.append("vhost=" + domain)
-            #print(params)
-            self.call(api, module=module, cmd=cmd, params=params)
-            print('The PHP version for the selected domains has been set to ' + php_id)
-    
     def ini_getter(self,user,domain):
         params = ['type=vhost', 'vhost=' + domain]
         php_ini_settings = self.call('uapi', 
