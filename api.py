@@ -51,6 +51,7 @@ class API():
         '''build list from domains into list of matching users, and their matching domains'''
         if self.current_user == "root":
             whmapi_domain_info = self.call("whmapi1", cmd="get_domain_info")
+            print(whmapi_domain_info)
             matching_domain_info = [domain_info for domain_info in whmapi_domain_info['data']['domains'] if domain_info['domain'] in domains_to_check]
             matching_users = {domain_info["user"] for domain_info in matching_domain_info}
         # transform list of matching domain info into dict of matching users and their own matching domains
