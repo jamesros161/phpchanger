@@ -144,7 +144,7 @@ class API():
         cmd = "php_ini_get_user_content"
         user_domains = self.breakup_domains_by_users()
         print(user_domains)
-        for user, domain in user_domains[0]['domains']:  
+        for user, domain in user_domains:  
             user = '--user=' + user     
             params =['type=vhost', 'vhost=' + domain]
             php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
