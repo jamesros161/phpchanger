@@ -92,7 +92,6 @@ class API():
                     )
             i += 1
 
-        print(users_domains)
         return users_domains
     
     def current_user_owns_this_domain(self, domain):
