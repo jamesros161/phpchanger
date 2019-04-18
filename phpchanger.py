@@ -38,6 +38,8 @@ def main():
     if hasattr(args, 'ini_subparser'):
         if args.ini_subparser == 'get':
             api.ini_get()
+        if args.ini_subparser == 'set':
+            api.ini_set()
      
     #determine_uapi_access()
     #print(run_cmd('whmapi1','listaccts', []))
