@@ -133,6 +133,7 @@ class API():
         if self.current_user == "root":
             api = "whmapi1"
             cmd = "php_set_vhost_versions"
+            params = []
 
             if isinstance(self.args.fpm, (list,)):
                 if self.args.version is None:
