@@ -29,19 +29,19 @@ class API():
         elif cmd_type == "uapi":
             print(cmd_type)
             # kill the script if these
-            print(api_return['apiversion'])
+            #print(api_return['apiversion'])
             if api_return['apiversion'] != 3:
                 sys.exit("This script not tested with uapi version " + api_return['apiversion'] + "expected 3 instead, exiting.")
-            print(api_return['result']['errors'])
+            #print(api_return['result']['errors'])
             if api_return['result']['errors'] is not None:    
                 sys.exit("uapi returned this error, exiting:\n" + '\n'.join(error for error in api_return['result']['errors']))
 
             # warn the user if these
-            print(api_return['result']['messages'])
+            #print(api_return['result']['messages'])
             if api_return['result']['messages'] is not None:
                 print(api_return['result']['messages'])
                 warnings.warn("uapi returned this message:\n" + '\n'.join(message for message in api_return['result']['messages']))
-            print(api_return['result']['warnings'])
+            #print(api_return['result']['warnings'])
             if api_return['result']['warnings'] is not None:
                 print(api_return['result']['warnings'])
                 warnings.warn("uapi returned this warning:\n" + '\n'.join(warning for warning in api_return['result']['warnings']))
@@ -163,7 +163,7 @@ class API():
                 params.append("vhost=" + domain)
             self.call(api, cmd=cmd, params=params)
             print('PHP version for domains '.join(self.args.domains) + ' has been set to ' + self.args.version)
-            
+
         else:
             api = "uapi"
             module = "LangPHP"
