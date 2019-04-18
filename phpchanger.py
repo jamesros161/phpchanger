@@ -27,7 +27,7 @@ current_user = getuser()
 
 def main():
 
-    print(dir(args.mngr_subparser))
+    print(args.mngr_subparser)
 
     #determine_uapi_access()
     #print(run_cmd('whmapi1','listaccts', []))
