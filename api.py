@@ -74,20 +74,14 @@ class API():
             return True
         else:
             return False
-        #for value in data.iteritems:
-        #    print(value)
-        #users_domains = users_domains + data['main_domain']
-        #print(users_domains)
-
+        
     def manager_get(self):
         api = "uapi"
         module = "LangPHP"
         cmd = "php_get_vhost_versions"
 
         vhost_php_versions = self.call(api, cmd, module=module)
-        #print vhost_php_versions
-        #check_api_return_for_issues(vhost_php_versions, cmd_type)
-
+        
         for vhost in (vhost for vhost in vhost_php_versions['result']['data'] if vhost['vhost'] in self.args.domains):
             print
             print vhost['vhost'] + ":"
@@ -151,78 +145,77 @@ class API():
         print(params)
         cmd_return = self.call(api, module=module, cmd=cmd, params=params)
         print(cmd_return)
-        #check_api_return_for_issues(cmd_return, cmd_type)
     
+    def ini_getter(self,user,domain):
+        params = ['type=vhost', 'vhost=' + domain]
+        php_ini_settings = self.call('uapi', 
+            user=user, module='LangPHP', 
+            cmd='php_ini_get_user_content', params=params)
+        metadata = php_ini_settings['result']['metadata']['LangPHP']
+        print(metadata['vhost'] + " (" + metadata['path'] + "):\n")
+        print(unescape(php_ini_settings['result']['data']['content']))
+
     def ini_get(self):
-        api = "uapi"
-        module = "LangPHP"
-        cmd = "php_ini_get_user_content"
         user_domains = self.breakup_domains_by_users()
-        for key, value in user_domains.iteritems():  
-            user = key
+        for key, value in user_domains.iteritems():
             if self.current_user == 'root':
-                params = ['type=vhost', 'vhost=' + value]
-                php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
-                metadata = php_ini_settings['result']['metadata']['LangPHP']
-                print(metadata['vhost'] + " (" + metadata['path'] + "):\n")
-                print(unescape(php_ini_settings['result']['data']['content']))
+                self.ini_getter(key, value)
             else:
                 x = 0
                 while x < len(value):
                     if self.current_user_owns_this_domain(value[x]):
-                        params = ['type=vhost', 'vhost=' + value[x]]
-                        php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
-                        metadata = php_ini_settings['result']['metadata']['LangPHP']
-                        print(metadata['vhost'] + " (" + metadata['path'] + "):\n")
-                        print(unescape(php_ini_settings['result']['data']['content']))
+                        self.ini_getter(self.current_user, value[x])
                     else:
                         print('\nDomain ' + value[x] + ' is not owned by this user --skipping...\n')
                     x += 1
-            
+    
+    def ini_setter(self,user,domain):
+        params = ['type=vhost', 'vhost=' + domain]
+        for index, setting in enumerate(self.args.setting, start=1):
+            params.append("directive-" + str(index) + "=" + setting[0] + "%3A" + setting[1])
+        print (self.call('uapi', user=user, 
+            module='LangPHP', cmd='php_ini_set_user_basic_directives', 
+            params=params))
 
     def ini_set(self):
-        api = "uapi"
-        module = "LangPHP"
-        cmd = "php_ini_set_user_basic_directives"
         user_domains = self.breakup_domains_by_users()
         for key, value in user_domains.iteritems():
-            user = key
             if self.current_user == 'root':
-                params = ['type=vhost', 'vhost=' + value]
-                for index, setting in enumerate(self.args.setting, start=1):
-                    params.append("directive-" + str(index) + "=" + setting[0] + "%3A" + setting[1])
-                print (self.call(api, user=user, module=module, cmd=cmd, params=params))
+                self.ini_setter(key, value)
             else:
                 x = 0
                 while x < len(value):
                     if self.current_user_owns_this_domain(value[x]):
-                        params = ['type=vhost', 'vhost=' + value[x]]
-                        for index, setting in enumerate(self.args.setting, start=1):
-                            params.append("directive-" + str(index) + "=" + setting[0] + "%3A" + setting[1])
-                        print (self.call(api, user=user, module=module, cmd=cmd, params=params))
+                        self.ini_setter(self.current_user, value[x])
                     else:
                         print('\nDomain ' + value[x] + ' is not owned by this user --skipping...\n')
                     x += 1
     
+    def editor(self, user, domain):
+        params = ['type=vhost', 'vhost=' + domain]
+        php_ini_settings = self.call('uapi', user=user, module='LangPHP', cmd='php_ini_get_user_content', params=params)
+        contents_to_edit = tempfile.NamedTemporaryFile(suffix=".tmp")
+        contents_to_edit.write(unescape(php_ini_settings['result']['data']['content']))
+        contents_to_edit.flush()
+        call([os.environ.get('EDITOR', 'nano'), contents_to_edit.name])
+        contents_to_edit.seek(0)
+        uri_encoded_contents = urllib.quote(contents_to_edit.read(), safe='')
+        print(uri_encoded_contents)
+        setparams = params
+        setparams.append('content=' + uri_encoded_contents)
+        new_php_ini_settings = self.call('uapi', user=user, module='LangPHP', cmd='php_ini_set_user_content', params=setparams)
+        print(new_php_ini_settings)
+
     def ini_edit(self):
-        api = "uapi"
-        module = "LangPHP"
-        cmd = "php_ini_get_user_content"
         user_domains = self.breakup_domains_by_users()
         for key, value in user_domains.iteritems():
-            user = key
             if self.current_user == 'root':
-                params = ['type=vhost', 'vhost=' + value]
-                php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
-                contents_to_edit = tempfile.NamedTemporaryFile(suffix=".tmp")
-                contents_to_edit.write(unescape(php_ini_settings['result']['data']['content']))
-                contents_to_edit.flush()
-                call([os.environ.get('EDITOR', 'nano'), contents_to_edit.name])
-                contents_to_edit.seek(0)
-                uri_encoded_contents = urllib.quote(contents_to_edit.read(), safe='')
-                setcmd = 'php_ini_set_user_content'
-                print(uri_encoded_contents)
-                setparams = params
-                setparams.append('content=' + uri_encoded_contents)
-                new_php_ini_settings = self.call(api, user=user, module=module, cmd=setcmd, params=setparams)
-                print(new_php_ini_settings)
+                self.editor(key, value)
+            else:
+                x = 0
+                while x < len(value):
+                    if self.current_user_owns_this_domain(value[x]):
+                        self.editor(self.current_user, value[x])
+                
+
+    
