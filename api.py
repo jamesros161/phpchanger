@@ -16,6 +16,28 @@ class API():
         self.current_user = getuser()
         self.args = parser_args
 
+    def check_api_return_for_issues(self, api_return, cmd_type):
+        if cmd_type == "whmapi1":
+            # kill the script if these
+            if api_return['metadata']['version'] != 1:
+                sys.exit("This script not tested with whmapi version " +  api_return['metadata']['version'] + "expected 1 instead, exiting.")
+            if api_return['metadata']['result'] != 1:
+                sys.exit("whmapi1 returned error flag with this reason, exiting:\n" + api_return['metadata']['reason'])
+        elif cmd_type == "uapi":
+            # kill the script if these
+            if api_return['apiversion'] != 3:
+                sys.exit("This script not tested with uapi version " + api_return['apiversion'] + "expected 3 instead, exiting.")
+            if api_return['result']['errors'] is not None:
+                sys.exit("uapi returned this error, exiting:\n" + '\n'.join(error for error in api_return['result']['errors']))
+
+            # warn the user if these
+            if api_return['result']['messages'] is not None:
+                warnings.warn("uapi returned this message:\n" + '\n'.join(message for message in api_return['result']['messages']))
+            if api_return['result']['warnings'] is not None:
+                warnings.warn("uapi returned this warning:\n" + '\n'.join(warning for warning in api_return['result']['warnings']))
+        else:
+            print("Unrecognized cmd_type, can't check.")
+
     def call(self, api,cmd='',params=[],module=None, user=''):
         if api == 'whmapi1' and self.current_user != 'root':
             sys.exit('WHMAPI1 commands must be run as root.')
@@ -34,6 +56,7 @@ class API():
             if self.args.verbose:
                 print('Command Return Data:\n')
                 print(data)
+            self.check_api_return_for_issues(data, api)
             return(data)
         else:
             print('Command Failed to Run')
@@ -200,7 +223,6 @@ class API():
         call([os.environ.get('EDITOR', 'nano'), contents_to_edit.name])
         contents_to_edit.seek(0)
         uri_encoded_contents = urllib.quote(contents_to_edit.read(), safe='')
-        print(uri_encoded_contents)
         setparams = params
         setparams.append('content=' + uri_encoded_contents)
         new_php_ini_settings = self.call('uapi', user=user, module='LangPHP', cmd='php_ini_set_user_content', params=setparams)
