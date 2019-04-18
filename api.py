@@ -18,16 +18,16 @@ class API():
 
     def check_api_return_for_issues(self, api_return, cmd_type):
         if cmd_type == "whmapi1":
-            print(cmd_type)
+            #print(cmd_type)
             # kill the script if these
-            print(api_return['metadata']['reason'])
+            #print(api_return['metadata']['reason'])
             if api_return['metadata']['version'] != 1:
                 sys.exit("This script not tested with whmapi version " +  api_return['metadata']['version'] + "expected 1 instead, exiting.")
-            print(api_return['metadata']['result'])
+            #print(api_return['metadata']['result'])
             if api_return['metadata']['result'] != 1:
                 sys.exit("whmapi1 returned error flag with this reason, exiting:\n" + api_return['metadata']['reason'])
         elif cmd_type == "uapi":
-            print(cmd_type)
+            #print(cmd_type)
             # kill the script if these
             #print(api_return['apiversion'])
             if api_return['apiversion'] != 3:
@@ -61,7 +61,7 @@ class API():
             sys.exit('invalid api type')
             
         data, error = Popen(popenargs, stdout=PIPE,stderr=PIPE).communicate()
-
+        print(error)
         if error == '':
             data = json.loads(data)
             if self.args.verbose:
