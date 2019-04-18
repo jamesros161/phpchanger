@@ -87,7 +87,13 @@ class API():
         i = 0
         while i < len(self.args.domains):
             domain = self.args.domains[i]
-            user = self.call('whmapi1', cmd='getdomainowner',params=['domain=' + domain])['data']['user']
+            if self.current_user == 'root':
+                user = self.call('whmapi1', cmd='getdomainowner',params=['domain=' + domain])['data']['user']
+            else:
+                user = self.call('uapi', module='DomainInfo', 
+                    cmd='single_domain_data', 
+                    params=['domain=' + domain])['result']['data']['user']
+        
             if user is not None:
                 users_domains[domain] = user
             else:
@@ -95,6 +101,7 @@ class API():
                     "or is not owned by the user calling this function --skipping\n"
                     )
             i += 1
+            
 
         return users_domains
     
