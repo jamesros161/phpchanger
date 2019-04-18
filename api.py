@@ -69,6 +69,8 @@ class API():
         data = response['result']['data']
         users_domains = [data['main_domain']]
         users_domains = users_domains + data['sub_domains']
+        users_domains = users_domains + data['addon_domains']
+        users_domains = users_domains + data['parked_domains']
         #for value in data.iteritems:
         #    print(value)
         #users_domains = users_domains + data['main_domain']
