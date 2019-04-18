@@ -1,6 +1,5 @@
 from argparse import ArgumentParser
 from argparse import RawTextHelpFormatter as Raw
-from api import API
 
 class Parser():
     def __init__(self):
@@ -23,7 +22,6 @@ class Parser():
         self.create_primary_subparsers()
         self.create_mngr_subparsers()
         self.create_ini_subparsers()
-        self.api = API(self.argparser.parse_args)
  
     def create_parent_parsers(self):
 
@@ -70,8 +68,6 @@ class Parser():
             epilog=self.epilogs.mngr_get_parser,
             formatter_class=Raw
         )
-        self.mngr_get_parser.set_defaults(func=self.api.manager_get)
-
 
         self.mngr_set_parser = self.mngr_subparser.add_parser( 'set',
             help=self.helpstr.mngr_set_parser,

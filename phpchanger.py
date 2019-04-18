@@ -34,8 +34,6 @@ def main():
     #print(api.call('uapi','domains_data',[],module='DomainInfo'))
     # start the selected module code
     # args.func()
-    args.func()
-
 
 def determine_uapi_access():
     '''this program needs to run uapi commands differently if ran as user, or as root, and needs to exit if ran as anything else (like a non-cPanel linux user)'''
