@@ -17,13 +17,13 @@ class API():
         self.current_user = getuser()
         self.args = parser_args
 
-    def call(self, api,cmd='',params=[],module=None):
+    def call(self, api,cmd='',params=[],module=None, user=''):
         if api == 'whmapi1' and self.current_user != 'root':
             sys.exit('WHMAPI1 commands must be run as root.')
         if api == 'whmapi1' and self.current_user == 'root':
             popenargs = [api, cmd, '--output=json'] + params
         if api == 'uapi' and self.current_user == 'root':
-            popenargs = [api, '--user=root', module, cmd, '--output=json'] + params
+            popenargs = [api, '--user=' + user, module, cmd, '--output=json'] + params
         if api == 'uapi' and self.current_user !='root':
             popenargs = [api, module, cmd, '--output=json'] + params
         if api != 'uapi' and api != 'whmapi1':
@@ -150,6 +150,7 @@ class API():
         module = "LangPHP"
         cmd = "php_ini_get_user_content"
         domains = self.breakup_domains_by_users()
+        print(domains)
         for domain in domains[0]['domains']:        
             params =['type=vhost', 'vhost=' + domain]
             php_ini_settings = self.call(api, module=module, cmd=cmd, params=params)
@@ -168,4 +169,27 @@ class API():
                 params.append("directive-" + str(index) + "=" + setting[0] + "%3A" + setting[1])
                 cmd_return = self.call(api, module=module, cmd=cmd, params=params)
                 print(cmd_return)
+
+    def ini_edit(domain, user_arg):
+        api = "uapi"
+        module = "LangPHP php_ini_get_user_content type=vhost vhost=" + domain
+
+        php_ini_settings = run_cmd_and_parse_its_yaml_return(cmd)
+        check_api_return_for_issues(php_ini_settings, cmd_type)
+
+        contents_to_edit = tempfile.NamedTemporaryFile(suffix=".tmp")
+        contents_to_edit.write(unescape(php_ini_settings['result']['data']['content']))
+        contents_to_edit.flush()
+        call([os.environ.get('EDITOR', 'nano'), contents_to_edit.name])
+        contents_to_edit.seek(0)
+
+        uri_encoded_contents = urllib.quote(contents_to_edit.read(), safe='')
+
+        print uri_encoded_contents
+
+        cmd_type = "uapi"
+        cmd = "uapi" + user_arg + " LangPHP php_ini_set_user_content type=vhost vhost=" + domain + " content=" + uri_encoded_contents
+
+        php_ini_settings = run_cmd_and_parse_its_yaml_return(cmd)
+        check_api_return_for_issues(php_ini_settings, cmd_type)
                 
