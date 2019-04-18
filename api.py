@@ -79,21 +79,28 @@ class API():
         return uapi_installed_php_versions['result']['data']['versions']
 
     def breakup_domains_by_users(self):
-        domains_to_check = self.args.domains
-        user_domains = {}
-        '''build list from domains into list of matching users, and their matching domains'''
-        if self.current_user == "root":
-            whmapi_domain_info = self.call("whmapi1", cmd="get_domain_info")
-            x = 0
-            while x < len(whmapi_domain_info['data']['domains']):
-                if whmapi_domain_info['data']['domains'][x]['domain'] in domains_to_check:
-                    user_domains[whmapi_domain_info['data']['domains'][x]['user']] = whmapi_domain_info['data']['domains'][x]['domain']
-                x += 1
-        else:
-            user_domains[self.current_user] = domains_to_check
-        if len(user_domains) == 0:
-            sys.exit('There are no domains on the server matching your request')
-        return user_domains
+        #domains_to_check = self.args.domains
+        #user_domains = {}
+        #if self.current_user == "root":
+        #    whmapi_domain_info = self.call("whmapi1", cmd="get_domain_info")
+        #    x = 0
+        #    while x < len(whmapi_domain_info['data']['domains']):
+        #        if whmapi_domain_info['data']['domains'][x]['domain'] in domains_to_check:
+        #            user_domains[whmapi_domain_info['data']['domains'][x]['user']] = whmapi_domain_info['data']['domains'][x]['domain']
+        #        x += 1
+        #else:
+        #    user_domains[self.current_user] = domains_to_check
+        #if len(user_domains) == 0:
+        #    sys.exit('There are no domains on the server matching your request')
+        x = 0
+        users_domains = {}
+        while x < len(self.args.domains):
+            domain = self.args.domains[x]
+            user = self.call('whmapi1', cmd='getdomainowner',params=['domain=' + self.args.domains[x]])['data']['user']
+            users_domains[user] = domain
+            x += 1
+        print(users_domains)
+        return users_domains
     
     def current_user_owns_this_domain(self, domain):
         users_domains = []
@@ -113,13 +120,8 @@ class API():
         api = "uapi"
         module = "LangPHP"
         cmd = "php_get_vhost_versions"
-        x = 0
-        while x < len(self.args.domains):
-            print(self.args.domains[x])
-            print(self.call('whmapi1', cmd='getdomainowner',params=['domain=' + self.args.domains[x]])['data']['user'])
-            x += 1
+        users_domains = self.breakup_domains_by_users()
 
-        user = self.call('whmapi1', cmd='getdomainowner')
         vhost_php_versions = self.call(api, cmd, module=module)
         list_of_vhosts = []
         for vhost in vhost_php_versions['result']['data']:
