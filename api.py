@@ -171,14 +171,9 @@ class API():
             else:
                 x = 0
                 while x < len(value):
-                    print(self.current_user_owns_this_domain(value[x]))
-                    params = ['type=vhost', 'vhost=' + value[x]]
-                    
-                    #php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
-                    #print(php_ini_settings)
-                    #metadata = php_ini_settings['result']['metadata']['LangPHP']
-                    #print(metadata['vhost'] + " (" + metadata['path'] + "):")
-                    #print(unescape(php_ini_settings['result']['data']['content']))
+                    if self.current_user_owns_this_domain(value[x]):
+                        params = ['type=vhost', 'vhost=' + value[x]]
+                        php_ini_settings = self.call(api, user=user, module=module, cmd=cmd, params=params)
                     x += 1
             
 
@@ -188,11 +183,18 @@ class API():
         cmd = "php_ini_set_user_basic_directives"
         user_domains = self.breakup_domains_by_users()
         for key, value in user_domains.iteritems():
-            user = key     
-            params = ['type=vhost', 'vhost=' + value]
-            for index, setting in enumerate(self.args.setting, start=1):
-                params.append("directive-" + str(index) + "=" + setting[0] + "%3A" + setting[1])
-            print (self.call(api, user=user, module=module, cmd=cmd, params=params))
+            user = key
+            if self.current_user == 'root':
+                params = ['type=vhost', 'vhost=' + value]
+                for index, setting in enumerate(self.args.setting, start=1):
+                    params.append("directive-" + str(index) + "=" + setting[0] + "%3A" + setting[1])
+                print (self.call(api, user=user, module=module, cmd=cmd, params=params))
+            else:
+                x = 0
+                while x < len(value):
+                    if self.current_user_owns_this_domain(value[x]):
+                        params = ['type=vhost', 'vhost=' + value]
+                        print (self.call(api, user=user, module=module, cmd=cmd, params=params))
     """
     def ini_edit(self, domain, user_arg):
         api = "uapi"
