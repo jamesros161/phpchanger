@@ -97,8 +97,8 @@ class API():
         print(len(self.args.domains))
         while x < len(self.args.domains):
             domain = self.args.domains[x]
-            user = self.call('whmapi1', cmd='getdomainowner',params=['domain=' + self.args.domains[x]])['data']['user']
-            users_domains[x][user] = domain[x]
+            user = self.call('whmapi1', cmd='getdomainowner',params=['domain=' + domain])['data']['user']
+            users_domains[user] = domain
             x += 1
         print(users_domains)
         return users_domains
