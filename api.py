@@ -114,6 +114,7 @@ class API():
 
         users_domains = self.breakup_domains_by_users()
         for domain in users_domains.iteritems():
+            print(domain)
             print(users_domains[domain])
             if users_domains[domain] is not None:
                 vhost_php_versions = self.call(api, user=users_domains[domain], cmd=cmd, module=module)
