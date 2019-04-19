@@ -201,7 +201,7 @@ class API():
             if (self.args.fpm) or (isinstance(self.args.fpm, (list,))):
                 logger.log('info', 'The PHP-FPM Configuration has been updated')
         if self.args.version is not None:
-            logger.log('info', 'The PHP version for the selected domains has been set to %', self.php_id)
+            logger.log('info', 'The PHP version for the selected domains has been set to %s', self.php_id)
 
     ### INI STUFF AND THINGS ###                
 
