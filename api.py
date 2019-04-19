@@ -208,7 +208,7 @@ class API():
             cmd='php_ini_get_user_content', params=params)
         metadata = php_ini_settings['result']['metadata']['LangPHP']
         self.format_title(metadata['vhost'] + " (" + metadata['path'] + ")")
-        print(self.escape(php_ini_settings['result']['data']['content']))
+        print(self.unescape(php_ini_settings['result']['data']['content']))
         #print(unescape(php_ini_settings['result']['data']['content']))
 
     def ini_set(self):
