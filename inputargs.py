@@ -15,7 +15,19 @@ class Parser():
         self.argparser.add_argument(
             '--verbose',
             action='store_true',
-            help='verbose'
+            help='Enable Verbose Display'
+        )
+
+        self.argparser.add_argument(
+            '--debug',
+            action='store_true',
+            help='Enable Debug Display'
+        )
+
+        self.argparser.add_argument(
+            '--quiet',
+            action='store_true',
+            help='Suppress all display except Error and Critical'
         )
 
         self.create_parent_parsers()

@@ -2,6 +2,9 @@
 
 from inputargs import Parser
 from api import API
+from Log import Logger
+
+logger = Logger()
 
 parser = Parser()
 args = parser.argparser.parse_args()
@@ -10,6 +13,16 @@ api = API(args)
 
 def main():
 
+    if args.verbose:
+        logger.setlevel('INFO')
+        logger.log('info', 'Verbose Option Enabled')
+    if args.debug:
+        logger.setlevel('DEBUG')
+        logger.log('debug', 'Debug Option Enabled')
+    if args.quiet:
+        logger.setlevel('ERROR')
+        logger.log('error', 'Quit Option Enabled')
+    
     if hasattr(args, 'mngr_subparser'):
         if args.mngr_subparser == 'get':
             api.manager_get()
