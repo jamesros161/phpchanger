@@ -1,9 +1,6 @@
 import json, sys, os, warnings, tempfile, urllib
 from getpass import getuser
 from subprocess import Popen, PIPE, call
-from HTMLParser import HTMLParser
-
-
 
 class API():
     def __init__(self, parser_args):
@@ -244,8 +241,7 @@ class API():
         contents_to_edit = tempfile.NamedTemporaryFile(prefix=domain + '-', suffix=".tmp",)
         contents_to_edit.write(unescape(php_ini_settings['result']['data']['content']))
         contents_to_edit.flush()
-        call(['nano' , contents_to_edit.name])
-        #call([os.environ.get('EDITOR', 'nano'), contents_to_edit.name])
+        call([os.environ.get('EDITOR', 'nano'), contents_to_edit.name])
         contents_to_edit.seek(0)
         uri_encoded_contents = urllib.quote(contents_to_edit.read(), safe='')
         setparams = params
