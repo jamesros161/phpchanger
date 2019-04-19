@@ -13,12 +13,6 @@ api = API(args)
 
 def main():
 
-    if args.verbose:
-        logger.setlevel('INFO')
-        logger.log('info', 'Verbose Option Enabled')
-        logger.log('warning', 'Verbose Option Enabled')
-        logger.log('error', 'Verbose Option Enabled')
-        logger.log('critical', 'Verbose Option Enabled')
     if args.debug:
         logger.setlevel('DEBUG')
         logger.log('debug', 'Debug Option Enabled')
@@ -26,8 +20,19 @@ def main():
         logger.log('warning', 'Debug Option Enabled')
         logger.log('error', 'Debug Option Enabled')
         logger.log('critical', 'Debug Option Enabled')
+        
+    if args.verbose:
+        logger.setlevel('INFO')
+        logger.log('debug', 'Verbose Option Enabled') #SHOULD NOT DISPLAY
+        logger.log('info', 'Verbose Option Enabled')
+        logger.log('warning', 'Verbose Option Enabled')
+        logger.log('error', 'Verbose Option Enabled')
+        logger.log('critical', 'Verbose Option Enabled')
     if args.quiet:
         logger.setlevel('ERROR')
+        logger.log('debug', 'Quit Option Enabled')#SHOULD NOT DISPLAY
+        logger.log('info', 'Quit Option Enabled')#SHOULD NOT DISPLAY
+        logger.log('warning', 'Quit Option Enabled')#SHOULD NOT DISPLAY
         logger.log('error', 'Quit Option Enabled')
         logger.log('critical', 'Quit Option Enabled')
     
