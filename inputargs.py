@@ -13,7 +13,7 @@ class Parser():
             formatter_class=Raw
         )
         self.argparser.add_argument(
-            'V', '--verbose',
+            '-V', '--verbose',
             action='store_true',
             help='Enable Verbose Display'
         )
