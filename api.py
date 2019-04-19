@@ -1,6 +1,9 @@
 import json, sys, os, warnings, tempfile, urllib
 from getpass import getuser
 from subprocess import Popen, PIPE, call
+from Log import Logger
+
+logger = Logger()
 
 class API():
     def __init__(self, parser_args):
@@ -27,25 +30,29 @@ class API():
     def check_api_return_for_issues(self, api_return, cmd_type):
         if cmd_type == "whmapi1":
             if api_return['metadata']['version'] != 1:
-                sys.exit("This script not tested with whmapi version " +  api_return['metadata']['version'] + "expected 1 instead, exiting.")
+                logger.log('critical', "This script not tested with whmapi version %s expected 1 instead, exiting", api_return['metadata']['version'])
+                sys.exit(1)
             if api_return['metadata']['result'] != 1:
-                sys.exit("whmapi1 returned error flag with this reason, exiting:\n" + api_return['metadata']['reason'])
+                logger.log('critical', "whmapi1 returned error flag with this reason, exiting: %s", api_return['metadata']['reason'])
+                sys.exit(1)
         elif cmd_type == "uapi":
             if api_return['apiversion'] != 3:
-                sys.exit("This script not tested with uapi version " + api_return['apiversion'] + "expected 3 instead, exiting.")
-            if api_return['result']['errors'] is not None:    
-                sys.exit("uapi returned this error, exiting:\n" + '\n'.join(error for error in api_return['result']['errors']))
-
+                logger.log('critical', "This script not tested with uapi version %s expected 3 instead, exiting." , api_return['apiversion'])
+                sys.exit(1)
+            if api_return['result']['errors'] is not None:
+                logger.log('citical', "uapi returned this error, exiting: %s", '\n'.join(error for error in api_return))
+                sys.exit(1)
             if api_return['result']['messages'] is not None:
-                warnings.warn("uapi returned this message:\n" + '\n'.join(message for message in api_return['result']['messages']))
+                logger.log('warning', "uapi returned this message: %s", '\n'.join(message for message in api_return['result']['messages']))
             if api_return['result']['warnings'] is not None:
-                warnings.warn("uapi returned this warning:\n" + '\n'.join(warning for warning in api_return['result']['warnings']))
+                logger.log('warning', "uapi returned this warning: %s", '\n'.join(warning for warning in api_return['result']['warnings']))
         else:
-            print("Unrecognized cmd_type, can't check.")
+            logger.log("critical", "Unrecognized cmd_type, can't check.")
 
     def call(self, api,cmd='',params=[],module=None, user=''):
         if api == 'whmapi1' and self.current_user != 'root':
-            sys.exit('WHMAPI1 commands must be run as root.')
+            logger.log("critical", 'WHMAPI1 commands must be run as root.')
+            sys.exit(1)
         if api == 'whmapi1' and self.current_user == 'root':
             popenargs = [api, cmd, '--output=json'] + params
         if api == 'uapi' and self.current_user == 'root':
@@ -53,19 +60,19 @@ class API():
         if api == 'uapi' and self.current_user !='root':
             popenargs = [api, module, cmd, '--output=json'] + params
         if api != 'uapi' and api != 'whmapi1':
-            sys.exit('invalid api type')
+            logger.log('critical', 'invalid api type')
+            sys.exit(1)
             
         data, error = Popen(popenargs, stdout=PIPE,stderr=PIPE).communicate()
         
         if error == '':
             data = json.loads(data)
-            if self.args.verbose:
-                print('Command Return Data:\n')
-                print(data)
+            logger.log('info', 'Command Return Data: %s', data)
             self.check_api_return_for_issues(data, api)
             return(data)
         else:
-            sys.exit(api + ' Command Failed to Run')
+            logger.log('critical', '%s Command Failed to Run', api)
+            sys.exit(1)
 
     def get_php_id(self):
         if self.args.version:
@@ -75,7 +82,7 @@ class API():
                 php_id = "ea-php" + str(int(self.args.version))
             except ValueError:
                 php_id = self.args.version
-
+                logger.log('info', 'Selected PHP version : %s', php_id)
             if php_id in installed_php_versions or php_id == "inherit":
                 return "version=" + php_id
             else:
@@ -84,13 +91,14 @@ class API():
     def get_installed_php_versions(self):
         if self.current_user == 'root':
             installed_php_versions = self.call("whmapi1", cmd="php_get_installed_versions")
+            logger.log('info','Installed PHP versions: %s', installed_php_versions['data']['versions'])
             return installed_php_versions['data']['versions']
         else:
             installed_php_versions = self.call("uapi", module="LangPHP", cmd="php_get_installed_versions")
+            logger.log('info','Installed PHP versions: %s', installed_php_versions['result']['data']['versions'])
             return installed_php_versions['result']['data']['versions']
 
     def breakup_domains_by_users(self):
-        
         users_domains = {}
         i = 0
         while i < len(self.args.domains):
@@ -106,9 +114,9 @@ class API():
             if user is not None:
                 users_domains[domain] = user
             else:
-                print("\n" + domain + " Either does not exist, " 
-                    "or is not owned by the user calling this function --skipping\n"
-                    )
+                logger.log("warning", " %s Either does not exist, " 
+                    "or is not owned by the user calling this function --skipping",
+                    domain)
             i += 1            
 
         return users_domains
@@ -141,10 +149,10 @@ class API():
                 if vhost['vhost'] == domain:          
                     self.format_title('VHOST: ' + vhost['vhost'])
                     if "system_default" in vhost['phpversion_source']:
-                        print "PHP Version: inherit (" + vhost['version'] + ")"
+                        print("PHP Version: inherit (" + vhost['version'] + ")")
                     else:
-                        print "PHP Version: " + vhost['version']
-                    print "PHP-FPM Status: " + ("Enabled" if vhost['php_fpm'] == 1 else "Disabled")
+                        print("PHP Version: " + vhost['version'])
+                    print("PHP-FPM Status: " + ("Enabled" if vhost['php_fpm'] == 1 else "Disabled"))
                     if vhost['php_fpm'] == 1:
                         print("PHP-FPM Pool, Max Children: " + str(vhost['php_fpm_pool_parms']['pm_max_children']))
                         print("PHP-FPM Pool, Process Idle Timeout: " + str(vhost['php_fpm_pool_parms']['pm_process_idle_timeout']))
@@ -156,24 +164,26 @@ class API():
         if self.current_user == "root":    
             if isinstance(self.args.fpm, (list,)):
                 if self.args.version is None:
-                    warnings.warn("Keep in mind that PHP-FPM will fail "
+                    logger.log('warning', "Keep in mind that PHP-FPM will fail "
                         "to enable if the PHP version is set to \"inherit\""
                         ". \nThis script doesnt check for that, hopefully you did."
                         )
                 elif self.args.version == "inherit" :
-                    sys.exit('PHP-FPM cannot be enabled while also setting PHP version to "inherit", exiting.')
-                params=[
-                    'php_fpm_pool_parms={"pm_max_children":' + \
-                    self.args.fpm[0] + ',"pm_process_idle_timeout":' + \
-                    self.args.fpm[1] + ',"pm_max_requests":' + \
-                    self.args.fpm[2] + '}',
-                    'php_fpm=1'
-                ]
+                    logger.log('error', 'PHP-FPM cannot be enabled while also setting PHP version to "inherit". --skipping')
+                else:
+                    params=[
+                        'php_fpm_pool_parms={"pm_max_children":' + \
+                        self.args.fpm[0] + ',"pm_process_idle_timeout":' + \
+                        self.args.fpm[1] + ',"pm_max_requests":' + \
+                        self.args.fpm[2] + '}',
+                        'php_fpm=1'
+                    ]
             elif self.args.fpm is False:
                 params ="php_fpm=0"
         
         users_domains = self.breakup_domains_by_users()
         for domain , user in users_domains.iteritems():
+            logger.log('debug', 'Domain: %s :: User: %s', domain, user)
             params.append("vhost=" + domain)
 
         # if user gave us digits, prefix ea-php, else we assume the user gave a full php ID.
@@ -182,14 +192,16 @@ class API():
             params.append(self.php_id)
 
         if self.current_user == "root":
+            logger.log('debug', 'Calling php_set_vhost_versions using WHMAPI1')
             self.call('whmapi1', cmd=cmd, params=params)
         else:
+            logger.log('debug', 'Calling php_set_vhost_versions using UAPI')
             self.call('uapi', cmd=cmd, module='LangPHP', params=params)
         if self.current_user == "root":
             if (self.args.fpm) or (isinstance(self.args.fpm, (list,))):
-                print('The PHP-FPM Configuration has been updated')
+                logger.log('info', 'The PHP-FPM Configuration has been updated')
         if self.args.version is not None:
-            print('The PHP version for the selected domains has been set to ' + self.php_id)
+            logger.log('info', 'The PHP version for the selected domains has been set to %', self.php_id)
 
     ### INI STUFF AND THINGS ###                
 
@@ -206,7 +218,6 @@ class API():
         metadata = php_ini_settings['result']['metadata']['LangPHP']
         self.format_title(metadata['vhost'] + " (" + metadata['path'] + ")")
         print(self.unescape(php_ini_settings['result']['data']['content']))
-        #print(unescape(php_ini_settings['result']['data']['content']))
 
     def ini_set(self):
         user_domains = self.breakup_domains_by_users()
@@ -226,7 +237,7 @@ class API():
             params[i] = params[i][1]
             i += 1
         dir_string = ', '.join(params[2:]).replace('%3A', ' = ')
-        print("Set php-ini directives:  " + dir_string + " :: for domain " + domain)
+        logger.log('info', "Set php-ini directives:  %s :: for domain %s", dir_string, domain)
 
     def ini_edit(self):
         user_domains = self.breakup_domains_by_users()
@@ -239,7 +250,7 @@ class API():
         params = ['type=vhost', 'vhost=' + domain]
         php_ini_settings = self.call('uapi', user=user, module='LangPHP', cmd='php_ini_get_user_content', params=params)
         contents_to_edit = tempfile.NamedTemporaryFile(prefix=domain + '-', suffix=".tmp",)
-        contents_to_edit.write(unescape(php_ini_settings['result']['data']['content']))
+        contents_to_edit.write(self.unescape(php_ini_settings['result']['data']['content']))
         contents_to_edit.flush()
         call([os.environ.get('EDITOR', 'nano'), contents_to_edit.name])
         contents_to_edit.seek(0)
@@ -247,7 +258,7 @@ class API():
         setparams = params
         setparams.append('content=' + uri_encoded_contents)
         self.call('uapi', user=user, module='LangPHP', cmd='php_ini_set_user_content', params=setparams)
-        print('PHP.INI saved for doamin :: ' + domain)
+        logger.log('info', 'PHP.INI saved for doamin :: %s', domain)
 
 
     

@@ -12,7 +12,7 @@ class Logger():
     def setlevel(self, level):
         self.logger.setLevel(level)
 
-    def log(self, level, message):
+    def log(self, level, message, *args):
         if level.upper() == 'CRITICAL':
             lvl = 50
         if level.upper() == 'ERROR':
@@ -23,4 +23,4 @@ class Logger():
             lvl = 20
         if level.upper() == 'DEBUG':
             lvl = 10
-        self.logger.log(lvl, message)
+        self.logger.log(lvl, message, *args)
