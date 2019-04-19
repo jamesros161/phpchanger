@@ -3,7 +3,7 @@ from getpass import getuser
 from subprocess import Popen, PIPE, call
 from HTMLParser import HTMLParser
 
-unescape = HTMLParser().unescape
+
 
 class API():
     def __init__(self, parser_args):
@@ -11,6 +11,14 @@ class API():
         self.args = parser_args
 
     ### GENERAL API METHODS ####
+    
+    def unescape(self, s):
+         s = s.replace('&lt;', '<')
+         s = s.replace('&gt;', '>')
+         s = s.replace('&quote;, '"')
+         # this has to be last:
+         s = s.replace('&amp;', '&')
+         return s
 
     def format_title(self, title):
         title = '#   ' + title + '   #'
@@ -200,7 +208,7 @@ class API():
             cmd='php_ini_get_user_content', params=params)
         metadata = php_ini_settings['result']['metadata']['LangPHP']
         self.format_title(metadata['vhost'] + " (" + metadata['path'] + ")")
-        print(php_ini_settings['result']['data']['content']).replace('&quot;', '"')
+        print(self.escape(php_ini_settings['result']['data']['content']))
         #print(unescape(php_ini_settings['result']['data']['content']))
 
     def ini_set(self):
