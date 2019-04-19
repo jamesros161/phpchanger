@@ -15,7 +15,7 @@ class API():
     def unescape(self, s):
          s = s.replace('&lt;', '<')
          s = s.replace('&gt;', '>')
-         s = s.replace('&quote;, '"')
+         s = s.replace('&quote;', '"')
          # this has to be last:
          s = s.replace('&amp;', '&')
          return s
